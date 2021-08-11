@@ -9,7 +9,7 @@ def get_todays_senate_hearings():
     url = "https://api.propublica.org/congress/v1/117/committees/hearings.json"
     # https://projects.propublica.org/api-docs/congress-api/committees/ (Get Recent Committee Hearings)
 
-    API_KEY = "sw8CjOT4YeI690S9byQ2Qa3XAuF1vbUClFcA8dOK"
+    API_KEY = ""
     headers = {
         "X-API-Key": API_KEY
     }
