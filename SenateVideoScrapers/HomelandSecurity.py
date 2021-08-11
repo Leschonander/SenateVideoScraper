@@ -15,11 +15,12 @@ def get_homeland_security_hearings():
     data = []
     for t in table_rows:
         date = t.findAll("td")[0].get_text().split(" ")
+
         row_obj = {
             "Date": date[0],
             "Time": date[1],
             "URL": t.findAll("a")[0]["href"],
-            "Title": t.findAll("a")[0].get_text(),
+            "Title": t.findAll("a")[0].get_text().replace("\n", "").rstrip().replace("\t", ""),
             "Location": t.findAll("td")[2].get_text().replace("\n", "")
         }
 
@@ -37,7 +38,7 @@ def get_homeland_security_hearings():
 
     data_table = pd.DataFrame(data)
 
-    data_table.to_csv("ex.csv")
+    return data_table
         
 
 get_homeland_security_hearings()
