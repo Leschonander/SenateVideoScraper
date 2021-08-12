@@ -1,2 +1,3 @@
 *.csv
 *.env
+*.DS_STORE
