@@ -2,9 +2,9 @@ import requests
 from bs4 import BeautifulSoup
 import pandas as pd
 
-def get_health_hearings():
+def get_banking_hearings():
 
-    url = "https://www.help.senate.gov/hearings?PageNum_rs=1&c=all"
+    url = "https://www.banking.senate.gov/hearings?c=all&mode=list"
     res = requests.get(url)
 
     soup =  BeautifulSoup(res.text,'html.parser')
@@ -23,7 +23,7 @@ def get_health_hearings():
             url = ""
             title = ""
         else:
-            url = "https://www.help.senate.gov" + t.find('a', {'class': 'summary'})["href"]
+            url = "https://www.banking.senate.gov" + t.find('a', {'class': 'summary'})["href"]
             title = t.find('a', {'class': 'summary'}).get_text().replace("\n", "").replace("\t", "")
         
 
@@ -52,7 +52,7 @@ def get_health_hearings():
             if soup_ind.find('a', { 'id': 'watch-live-now'}) == None:
                 video_url = ""
             else:
-                video_url =  "https://www.help.senate.gov" + soup_ind.find('a', { 'id': 'watch-live-now'})["href"].replace("javascript:openVideoWin('", "").replace("');", "")
+                video_url =  "https://www.banking.senate.gov" + soup_ind.find('a', { 'id': 'watch-live-now'})["href"].replace("javascript:openVideoWin('", "").replace("');", "")
             
             d["video_url"] = video_url
     
@@ -61,4 +61,4 @@ def get_health_hearings():
     return data_table
 
 
-get_health_hearings()
+get_banking_hearings()
