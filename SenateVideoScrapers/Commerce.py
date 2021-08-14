@@ -36,4 +36,4 @@ def get_commerce_hearings():
 
     return data_table
 
-get_commerce_hearings().to_csv("ex_com.csv")
+get_commerce_hearings()
