@@ -54,7 +54,6 @@ def get_SBC_hearings():
             d["video_url"] = video_url
     
     data_table = pd.DataFrame(data)
-    print(data_table)
 
     return data_table
 
