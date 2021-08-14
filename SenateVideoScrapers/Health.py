@@ -55,10 +55,8 @@ def get_health_hearings():
                 video_url =  "https://www.help.senate.gov" + soup_ind.find('a', { 'id': 'watch-live-now'})["href"].replace("javascript:openVideoWin('", "").replace("');", "")
             
             d["video_url"] = video_url
-            print(video_url)
     
     data_table = pd.DataFrame(data)
-    print(data_table)
 
     return data_table
 
