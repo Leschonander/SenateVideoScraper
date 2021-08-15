@@ -4,7 +4,7 @@ import pandas as pd
 
 def get_budget_hearings():
 
-    url = "https://www.banking.senate.gov/hearings?c=all&mode=list"
+    url = "https://www.budget.senate.gov/hearings"
     res = requests.get(url)
 
     soup =  BeautifulSoup(res.text,'html.parser')
@@ -22,7 +22,7 @@ def get_budget_hearings():
         else:
             url = "https://www.budget.senate.gov" + t.find('a', {'class': 'summary'})["href"]
             title = t.find('a', {'class': 'summary'}).get_text().replace("\n", "").replace("\t", "")
-        
+            print(url)
 
         if t.find('span', {'class': 'location'}) == None:
             location = ""
