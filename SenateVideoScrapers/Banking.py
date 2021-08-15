@@ -4,10 +4,11 @@ import pandas as pd
 
 def get_banking_hearings():
 
-    url = "https://www.banking.senate.gov/hearings?c=all&mode=list"
+    url = "https://www.banking.senate.gov/hearings?maxrows=2000"
     res = requests.get(url)
 
     soup =  BeautifulSoup(res.text,'html.parser')
+
     table_rows = soup.findAll('tr', { 'class': 'vevent'})
     data = []
     for t in table_rows:
@@ -57,7 +58,7 @@ def get_banking_hearings():
             d["video_url"] = video_url
     
     data_table = pd.DataFrame(data)
-
+    
     return data_table
 
 

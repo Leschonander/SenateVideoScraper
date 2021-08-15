@@ -4,7 +4,7 @@ import pandas as pd
 
 def get_appropriations_hearings():
 
-    url = "https://www.appropriations.senate.gov/hearings?c=all&mode=list"
+    url = "https://www.appropriations.senate.gov/hearings?maxrows=4000"
     res = requests.get(url)
 
     soup =  BeautifulSoup(res.text,'html.parser')
@@ -57,7 +57,6 @@ def get_appropriations_hearings():
             d["video_url"] = video_url
     
     data_table = pd.DataFrame(data)
-    print(data_table)
 
     return data_table
     

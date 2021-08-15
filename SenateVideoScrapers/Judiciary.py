@@ -5,7 +5,7 @@ import pandas as pd
 
 def get_judiciary_hearings():
 
-    url = "https://www.judiciary.senate.gov/hearings"
+    url = "https://www.judiciary.senate.gov/hearings?maxrows=2000"
     res = requests.get(url)
 
     soup =  BeautifulSoup(res.text,'html.parser')

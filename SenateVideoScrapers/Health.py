@@ -4,7 +4,7 @@ import pandas as pd
 
 def get_health_hearings():
 
-    url = "https://www.help.senate.gov/hearings?PageNum_rs=1&c=all"
+    url = "https://www.help.senate.gov/hearings?maxrows=4000"
     res = requests.get(url)
 
     soup =  BeautifulSoup(res.text,'html.parser')
@@ -39,7 +39,7 @@ def get_health_hearings():
             "Title": title,
             "Location": location
         }
-        
+        print(row_obj)
         data.append(row_obj)
     
     for d in data:

@@ -4,25 +4,47 @@ import pandas as pd
 
 def get_foreign_hearings():
 
-    url = "https://www.foreign.senate.gov/hearings"
+    url = "https://www.foreign.senate.gov/hearings?maxrows=5000"
     res = requests.get(url)
 
     soup =  BeautifulSoup(res.text,'html.parser')
     table_rows = soup.findAll('tr', { 'class': 'vevent'})
     data = []
     for t in table_rows:
-        date = t.findAll("time")[0].get_text().split(" ")
-        try:
-            time = date[1]
-        except IndexError:
-            time = ''
+        if t.find('time', {'class': 'dtstart'}) == None:
+            date = ""
+            time = ""
+        else:
+            date_time = t.find('time', {'class': 'dtstart'}).get_text().split(" ")
+            
+            try:
+                date = date_time[0]
+            except:
+                date = ""
+            try:
+                time = date_time[1]
+            except IndexError:
+                time = ""
+        
+        if t.find('a', {'class': 'summary'}) == None:
+            url = ""
+            title = ""
+        else:
+            url = "https://www.foreign.senate.gov" + t.find('a', {'class': 'summary'})["href"]
+            title = t.find('a', {'class': 'summary'}).get_text().replace("\n", "").replace("\t", "")
+        
+
+        if t.find('span', {'class': 'location'}) == None:
+            location = ""
+        else:
+            location =  t.find('span', {'class': 'location'}).get_text()
             
         row_obj = {
-            "Date": date[0],
+            "Date": date,
             "Time": time,
-            "URL": "https://www.foreign.senate.gov/" + t.findAll("a")[0]["href"],
-            "Title": t.find("td").get_text().replace("\n", "").replace("\t", ""),
-            "Location": t.find("span", {'class': "location"}).get_text()
+            "URL": url,
+            "Title": title,
+            "Location": location
         }
         
         data.append(row_obj)
@@ -39,7 +61,7 @@ def get_foreign_hearings():
         d["video_url"] = video_url
     
     data_table = pd.DataFrame(data)
-
+    
     return data_table
 
 
