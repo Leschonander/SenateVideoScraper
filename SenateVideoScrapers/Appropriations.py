@@ -37,7 +37,8 @@ def get_appropriations_hearings():
             "Time": time,
             "URL": url,
             "Title": title,
-            "Location": location
+            "Location": location,
+            "Committee": "Approporiations"
         }
         
         data.append(row_obj)

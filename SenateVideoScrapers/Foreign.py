@@ -44,7 +44,8 @@ def get_foreign_hearings():
             "Time": time,
             "URL": url,
             "Title": title,
-            "Location": location
+            "Location": location,
+            "Committee": "Foreign"
         }
         
         data.append(row_obj)

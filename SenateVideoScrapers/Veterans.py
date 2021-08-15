@@ -5,22 +5,41 @@ import pandas as pd
 
 def get_veterans_hearings():
 
-    url = "https://www.veterans.senate.gov/hearings?c=all"
+    url = "https://www.veterans.senate.gov/hearings?c=all&maxrows=5000"
     res = requests.get(url)
 
     soup =  BeautifulSoup(res.text,'html.parser')
     table_rows = soup.findAll('tr', { 'class': 'vevent'})
     data = []
     for t in table_rows:
+        if t.find('time', {'class': 'dtstart'}) == None:
+            date = ""
+            time = ""
+        else:
+            date_time = t.find('time', {'class': 'dtstart'}).get_text().split(" ")
+            date = date_time[0]
+            time = date_time[1]
+        
+        if t.find('a', {'class': 'summary'}) == None:
+            url = ""
+            title = ""
+        else:
+            url = t.find('a', {'class': 'summary'})["href"].replace("\n", "").replace("\t", "")
+            title = t.find('a', {'class': 'summary'}).get_text().replace("\n", "").replace("\t", "")
+        
 
-        date_time = t.find('time', {'class': 'dtstart'}).get_text().split(" ")
-
+        if t.find('span', {'class': 'location'}) == None:
+            location = ""
+        else:
+            location =  t.find('span', {'class': 'location'}).get_text()
+        
         row_obj = {
-            "Date":date_time[0],
-            "Time": date_time[1],
-            "URL": t.find('a', {'class': 'summary'})["href"].replace("\n", "").replace("\t", ""),
-            "Title": t.find('a', {'class': 'summary'}).get_text().replace("\n", "").replace("\t", ""),
-            "Location": t.find('td', {'class': 'location'}).get_text().replace("\n", "").replace("\t", "").replace("Location", "")
+            "Date": date,
+            "Time": time,
+            "URL": url,
+            "Title": title,
+            "Location": location,
+            "Committee": "Veterans"
         }
 
         data.append(row_obj)

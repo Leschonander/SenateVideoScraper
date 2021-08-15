@@ -5,7 +5,7 @@ import pandas as pd
 
 def get_rules_hearings():
 
-    url = "https://www.rules.senate.gov/hearings"
+    url = "https://www.rules.senate.gov/hearings?maxrows=5000"
     res = requests.get(url)
 
     soup =  BeautifulSoup(res.text,'html.parser')
@@ -31,7 +31,8 @@ def get_rules_hearings():
             "Time": time,
             "URL": "https://www.rules.senate.gov" + t.find("a", {'class': 'url'})["href"],
             "Title":  t.find("a", {'class': 'url'}).get_text().replace("\n", "").replace("\t", ""),
-            "Location": location
+            "Location": location,
+            "Committee": "Rules"
         }
 
         data.append(row_obj)

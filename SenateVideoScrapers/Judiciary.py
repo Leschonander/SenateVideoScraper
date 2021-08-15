@@ -19,7 +19,8 @@ def get_judiciary_hearings():
             "Time": date[1].replace("\n", ""),
             "URL": "https://www.judiciary.senate.gov/" + t.findAll("a")[0]["href"],
             "Title": t.findAll("a")[0].get_text().replace("\n", "").rstrip().replace("\t", ""),
-            "Location": t.findAll("td")[2].get_text().replace("\n", "").replace("\t", "")
+            "Location": t.findAll("td")[2].get_text().replace("\n", "").replace("\t", ""),
+            "Committee": "Judiciary"
         }
         
         data.append(row_obj)

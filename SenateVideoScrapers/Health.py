@@ -37,7 +37,8 @@ def get_health_hearings():
             "Time": time,
             "URL": url,
             "Title": title,
-            "Location": location
+            "Location": location,
+            "Committee": "Health"
         }
         print(row_obj)
         data.append(row_obj)

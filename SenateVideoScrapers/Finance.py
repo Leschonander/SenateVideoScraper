@@ -28,7 +28,8 @@ def get_finance_hearings():
             "Time": "",
             "URL": link,
             "Title": title,
-            "Location": ""
+            "Location": "",
+            "Committee": "Finance"
         }
         
         data.append(row_obj)

@@ -5,7 +5,7 @@ import pandas as pd
 
 def get_agricultural_hearings():
 
-    url = "https://www.agriculture.senate.gov/hearings?c=all"
+    url = "https://www.agriculture.senate.gov/hearings?maxrows=5000"
     res = requests.get(url)
 
     soup =  BeautifulSoup(res.text,'html.parser')
@@ -37,7 +37,8 @@ def get_agricultural_hearings():
             "Time": time,
             "URL": url,
             "Title": title,
-            "Location": location
+            "Location": location,
+            "Committee": "Agriculture"
         }
         
         data.append(row_obj)
@@ -61,4 +62,4 @@ def get_agricultural_hearings():
 
     return data_table
 
-get_agricultural_hearings()
+get_agricultural_hearings().to_csv("../SenateVideoFiles/Agricultural.csv")

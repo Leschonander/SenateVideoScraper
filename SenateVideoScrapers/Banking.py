@@ -38,7 +38,8 @@ def get_banking_hearings():
             "Time": time,
             "URL": url,
             "Title": title,
-            "Location": location
+            "Location": location,
+            "Committee": "Banking"
         }
         
         data.append(row_obj)
