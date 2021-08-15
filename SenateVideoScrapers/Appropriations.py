@@ -2,9 +2,9 @@ import requests
 from bs4 import BeautifulSoup
 import pandas as pd
 
-def get_budget_hearings():
+def get_appropriations_hearings():
 
-    url = "https://www.budget.senate.gov/hearings"
+    url = "https://www.appropriations.senate.gov/hearings?c=all&mode=list"
     res = requests.get(url)
 
     soup =  BeautifulSoup(res.text,'html.parser')
@@ -13,15 +13,19 @@ def get_budget_hearings():
     for t in table_rows:
         if t.find('time', {'class': 'dtstart'}) == None:
             date = ""
+            time = ""
         else:
-            date = t.find('time', {'class': 'dtstart'}).get_text()
+            date_time = t.find('time', {'class': 'dtstart'}).get_text().split(" ")
+            date = date_time[0]
+            time = date_time[1]
         
         if t.find('a', {'class': 'summary'}) == None:
             url = ""
             title = ""
         else:
-            url = "https://www.budget.senate.gov" + t.find('a', {'class': 'summary'})["href"]
+            url = "https://www.appropriations.senate.gov/" + t.find('a', {'class': 'summary'})["href"]
             title = t.find('a', {'class': 'summary'}).get_text().replace("\n", "").replace("\t", "")
+        
 
         if t.find('span', {'class': 'location'}) == None:
             location = ""
@@ -30,7 +34,7 @@ def get_budget_hearings():
         
         row_obj = {
             "Date": date,
-            "Time": "",
+            "Time": time,
             "URL": url,
             "Title": title,
             "Location": location
@@ -44,11 +48,11 @@ def get_budget_hearings():
         else:
             res_ind = requests.get(d["URL"])
             soup_ind = BeautifulSoup(res_ind.text,'html.parser')
-
+            
             if soup_ind.find('a', { 'id': 'watch-live-now'}) == None:
                 video_url = ""
             else:
-                video_url =  "https://www.budget.senate.gov" + soup_ind.find('a', { 'id': 'watch-live-now'})["href"].replace("javascript:openVideoWin('", "").replace("');", "")
+                video_url =  "https://www.appropriations.senate.gov" + soup_ind.find('a', { 'id': 'watch-live-now'})["href"].replace("javascript:openVideoWin('", "").replace("');", "")
             
             d["video_url"] = video_url
     
@@ -56,5 +60,7 @@ def get_budget_hearings():
     print(data_table)
 
     return data_table
+    
 
-get_budget_hearings()
+
+get_appropriations_hearings()
