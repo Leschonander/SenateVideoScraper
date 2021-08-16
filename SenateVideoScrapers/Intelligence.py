@@ -3,9 +3,9 @@ from bs4 import BeautifulSoup
 import pandas as pd
 
 
-def get_intelligence_hearings():
+def get_intelligence_hearings(page: int):
 
-    url = "https://www.intelligence.senate.gov/hearings"
+    url = "https://www.intelligence.senate.gov/hearings?page=" + str(page)
     res = requests.get(url)
 
     soup =  BeautifulSoup(res.text,'html.parser')
@@ -26,7 +26,8 @@ def get_intelligence_hearings():
             "Time": time,
             "URL": "https://www.intelligence.senate.gov/" + t.findAll("a")[0]["href"],
             "Title": t.findAll("a")[0].get_text().replace("\n", "").rstrip().replace("\t", ""),
-            "Location": ""
+            "Location": "",
+            "Committee": "Intelligence"
         }
 
         data.append(row_obj)
@@ -46,4 +47,12 @@ def get_intelligence_hearings():
 
     return data_table
 
-get_intelligence_hearings()
+pages = [i for i in range(0, 44)]
+data_table_list = []
+for p in pages:
+    result = get_intelligence_hearings(p)
+    print(result)
+    data_table_list.append(result)
+
+data_table_list_master = pd.concat(data_table_list)
+data_table_list_master.to_csv("../SenateVideoFiles/Intelligence.csv")

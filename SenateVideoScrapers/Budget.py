@@ -2,9 +2,9 @@ import requests
 from bs4 import BeautifulSoup
 import pandas as pd
 
-def get_budget_hearings():
+def get_budget_hearings(page):
 
-    url = "https://www.budget.senate.gov/hearings"
+    url = "https://www.budget.senate.gov/hearings?PageNum_rs=" + str(page)
     res = requests.get(url)
 
     soup =  BeautifulSoup(res.text,'html.parser')
@@ -33,7 +33,8 @@ def get_budget_hearings():
             "Time": "",
             "URL": url,
             "Title": title,
-            "Location": location
+            "Location": location,
+            "Committee": "Budget"
         }
         
         data.append(row_obj)
@@ -57,4 +58,12 @@ def get_budget_hearings():
 
     return data_table
 
-get_budget_hearings()
+pages = [i for i in range(1, 15)]
+data_table_list = []
+for p in pages:
+    result = get_budget_hearings(p)
+    print(result)
+    data_table_list.append(result)
+
+data_table_list_master = pd.concat(data_table_list)
+data_table_list_master.to_csv("../SenateVideoFiles/Budget.csv")

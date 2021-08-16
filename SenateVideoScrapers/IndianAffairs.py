@@ -3,9 +3,9 @@ from bs4 import BeautifulSoup
 import pandas as pd
 
 
-def get_indian_affairs_hearings():
+def get_indian_affairs_hearings(page: int):
 
-    url = "https://www.indian.senate.gov/hearings"
+    url = "https://www.indian.senate.gov/hearings?page=" + str(page)
     res = requests.get(url)
 
     soup =  BeautifulSoup(res.text,'html.parser')
@@ -13,12 +13,19 @@ def get_indian_affairs_hearings():
     table_rows = table_rows[1:]
     data = []
     for t in table_rows:
+
+        if  t.find("td", {'class': "views-field-field-hearing-new-office"}) == None:
+            location = ""
+        else:
+            location = t.find("td", {'class': "views-field-field-hearing-new-office"}).get_text().rstrip().lstrip()
+
         row_obj = {
             "Date": t.find("span", {'class': "date-display-single"}).get_text(),
             "Time": t.findAll("span", {'class': "date-display-single"})[1].get_text(),
             "URL": "https://www.indian.senate.gov/" + t.findAll("a")[0]["href"],
             "Title": t.findAll("a")[0].get_text().replace("\n", "").rstrip().replace("\t", ""),
-            "Location":  t.find("td", {'class': "views-field-field-hearing-new-office"}).get_text().rstrip().lstrip()
+            "Location": location,
+            "Committee": "Indian Affairs"
         }
         data.append(row_obj)
     
@@ -41,4 +48,12 @@ def get_indian_affairs_hearings():
     
     return data_table
 
-get_indian_affairs_hearings()
+pages = [i for i in range(0, 49)]
+data_table_list = []
+for p in pages:
+    result = get_indian_affairs_hearings(p)
+    print(result)
+    data_table_list.append(result)
+
+data_table_list_master = pd.concat(data_table_list)
+data_table_list_master.to_csv("../SenateVideoFiles/IndianAffairs.csv")
