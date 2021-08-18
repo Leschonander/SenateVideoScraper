@@ -57,6 +57,7 @@ def get_veterans_hearings():
                 video_url = "https://www.veterans.senate.gov" + soup_ind.find('a', { 'id': 'watch-live-now'})["href"].replace("javascript:openVideoWin('", "").replace("');", "")
             
             d["video_url"] = video_url
+        print(d)
     
     data_table = pd.DataFrame(data)
     print(data_table)
@@ -64,4 +65,4 @@ def get_veterans_hearings():
     return data_table
 
 
-get_veterans_hearings()
+get_veterans_hearings().to_csv("../SenateVideoFiles/Veterans.csv")

@@ -3,9 +3,9 @@ from bs4 import BeautifulSoup
 import pandas as pd
 
 
-def get_energy_hearings():
+def get_energy_hearings(page: int):
 
-    url = "https://www.energy.senate.gov/hearings?month=&year="
+    url = "https://www.energy.senate.gov/hearings?page=" + str(page)
     res = requests.get(url)
 
     soup =  BeautifulSoup(res.text,'html.parser')
@@ -17,7 +17,6 @@ def get_energy_hearings():
             date = ""
         else:
             date = t.find('span', {'class': 'element-date'}).get_text()
-            # ^ Need way to add year, perahps in params?
         
         if t.find('span', {'class': 'element-time'}) == None:
             time = ""
@@ -40,7 +39,8 @@ def get_energy_hearings():
             "Time": time,
             "URL": url,
             "Title": title,
-            "Location": ""
+            "Location": "",
+            "Committee": "Energy"
         }
 
         data.append(row_obj)
@@ -63,4 +63,12 @@ def get_energy_hearings():
 
     return data_table
 
-get_energy_hearings()
+pages = [i for i in range(1, 17)]
+data_table_list = []
+for p in pages:
+    result = get_energy_hearings(p)
+    print(result)
+    data_table_list.append(result)
+
+data_table_list_master = pd.concat(data_table_list)
+data_table_list_master.to_csv("../SenateVideoFiles/Energy.csv")

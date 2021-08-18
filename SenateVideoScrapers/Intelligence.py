@@ -33,15 +33,18 @@ def get_intelligence_hearings(page: int):
         data.append(row_obj)
     
     for d in data:
-        res_ind = requests.get(d["URL"])
-        soup_ind = BeautifulSoup(res_ind.text,'html.parser')
-        
-        if soup_ind.find('iframe') == None:
-            video_url = ""
+        if d["URL"] == "":
+            d["video_url"] = ""
         else:
-            video_url =  soup_ind.find('iframe')["src"]
-        
-        d["video_url"] = video_url
+            res_ind = requests.get(d["URL"])
+            soup_ind = BeautifulSoup(res_ind.text,'html.parser')
+            
+            if soup_ind.find('iframe') == None:
+                video_url = ""
+            else:
+                video_url =  soup_ind.find('iframe')["src"]
+            
+            d["video_url"] = video_url
     
     data_table = pd.DataFrame(data)
 

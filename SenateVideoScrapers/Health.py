@@ -23,7 +23,7 @@ def get_health_hearings():
             url = ""
             title = ""
         else:
-            url = "https://www.help.senate.gov" + t.find('a', {'class': 'summary'})["href"]
+            url = "https://www.help.senate.gov/" + t.find('a', {'class': 'summary'})["href"]
             title = t.find('a', {'class': 'summary'}).get_text().replace("\n", "").replace("\t", "")
         
 
@@ -40,7 +40,7 @@ def get_health_hearings():
             "Location": location,
             "Committee": "Health"
         }
-        print(row_obj)
+
         data.append(row_obj)
     
     for d in data:
@@ -56,10 +56,10 @@ def get_health_hearings():
                 video_url =  "https://www.help.senate.gov" + soup_ind.find('a', { 'id': 'watch-live-now'})["href"].replace("javascript:openVideoWin('", "").replace("');", "")
             
             d["video_url"] = video_url
-    
+        print(d)
     data_table = pd.DataFrame(data)
-
+    print(data_table)
     return data_table
 
 
-get_health_hearings()
+get_health_hearings().to_csv("../SenateVideoFiles/Health.csv")

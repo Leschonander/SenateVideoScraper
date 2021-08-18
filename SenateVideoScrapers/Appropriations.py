@@ -56,11 +56,11 @@ def get_appropriations_hearings():
                 video_url =  "https://www.appropriations.senate.gov" + soup_ind.find('a', { 'id': 'watch-live-now'})["href"].replace("javascript:openVideoWin('", "").replace("');", "")
             
             d["video_url"] = video_url
-    
+        print(d)
     data_table = pd.DataFrame(data)
-
+    print(data_table)
     return data_table
     
 
 
-get_appropriations_hearings()
+get_appropriations_hearings().to_csv("../SenateVideoFiles/Approporiations.csv")

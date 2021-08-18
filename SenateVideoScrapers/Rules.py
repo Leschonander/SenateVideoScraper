@@ -38,17 +38,20 @@ def get_rules_hearings():
         data.append(row_obj)
     
     for d in data:
-        res_ind = requests.get(d["URL"])
-        soup_ind = BeautifulSoup(res_ind.text,'html.parser')
-        if soup_ind.find('a', { 'id': 'watch-live-now'}) == None:
-            video_url = ""
+        if d["URL"] == "":
+            d["video_url"] = ""
         else:
-            video_url =  "https://www.rules.senate.gov" + soup_ind.find('a', { 'id': 'watch-live-now'})["href"].replace("javascript:openVideoWin('", "").replace("');", "")
-        
-        d["video_url"] = video_url
-    
+            res_ind = requests.get(d["URL"])
+            soup_ind = BeautifulSoup(res_ind.text,'html.parser')
+            if soup_ind.find('a', { 'id': 'watch-live-now'}) == None:
+                video_url = ""
+            else:
+                video_url =  "https://www.rules.senate.gov" + soup_ind.find('a', { 'id': 'watch-live-now'})["href"].replace("javascript:openVideoWin('", "").replace("');", "")
+            
+            d["video_url"] = video_url
+        print(d)
     data_table = pd.DataFrame(data)
-
+    print(data_table)
     return data_table
 
-get_rules_hearings()
+get_rules_hearings().to_csv("../SenateVideoFiles/Rules.csv")
