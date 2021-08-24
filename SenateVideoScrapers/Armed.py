@@ -1,10 +1,11 @@
 import requests
 from bs4 import BeautifulSoup
 import pandas as pd
+import os 
 
-def get_armed_hearings():
+def get_armed_hearings(rows: int):
 
-    url = "https://www.armed-services.senate.gov/hearings?c=all&maxrows=5000"
+    url = "https://www.armed-services.senate.gov/hearings?c=all&maxrows=" + str(rows)
     res = requests.get(url)
 
     soup =  BeautifulSoup(res.text,'html.parser')
@@ -61,4 +62,13 @@ def get_armed_hearings():
     
     return data_table
 
-get_armed_hearings().to_csv("../SenateVideoFiles/Armed.csv")
+if os.path.exists("../SenateVideoFiles/Armed.csv") == True:
+    new_data = get_armed_hearings(rows=10)
+    old_data = pd.read_csv("../SenateVideoFiles/Armed.csv")
+    combined_data = pd.concat([new_data, old_data])
+    combined_data = combined_data.drop_duplicates("URL")
+    combined_data.to_csv("../SenateVideoFiles/Armed.csv")
+else: 
+    get_armed_hearings(rows=5000).to_csv("../SenateVideoFiles/Armed.csv")
+
+

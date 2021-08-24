@@ -1,6 +1,8 @@
 import requests
 from bs4 import BeautifulSoup
 import pandas as pd
+import os
+from datetine import datetime
 
 def get_commerce_hearings(year: int):
 
@@ -57,13 +59,21 @@ def get_commerce_hearings(year: int):
     
     return data_table
 
-years = [i for i in range(2003, 2022)]
+if os.path.exists("../SenateVideoFiles/Commerce.csv") == True:
+    year = datetime.today().year
+    new_data = get_commerce_hearings(year)
+    old_data = pd.read_csv("../SenateVideoFiles/Commerce.csv")
+    combined_data = pd.concat([new_data, old_data])
+    combined_data = combined_data.drop_duplicates("URL")
+    combined_data.to_csv("../SenateVideoFiles/Commerce.csv")
+else:
+    years = [i for i in range(2003, 2022)]
 
-data_table_list = []
-for y in years:
-    result = get_commerce_hearings(y)
-    print(result, y)
-    data_table_list.append(result)
+    data_table_list = []
+    for y in years:
+        result = get_commerce_hearings(y)
+        print(result, y)
+        data_table_list.append(result)
 
-data_table_list_master = pd.concat(data_table_list)
-data_table_list_master.to_csv("../SenateVideoFiles/Commerce.csv")
+    data_table_list_master = pd.concat(data_table_list)
+    data_table_list_master.to_csv("../SenateVideoFiles/Commerce.csv")
