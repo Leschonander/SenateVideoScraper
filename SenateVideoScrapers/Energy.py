@@ -1,7 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 import pandas as pd
-
+import os
 
 def get_energy_hearings(page: int):
 
@@ -63,12 +63,20 @@ def get_energy_hearings(page: int):
 
     return data_table
 
-pages = [i for i in range(1, 17)]
-data_table_list = []
-for p in pages:
-    result = get_energy_hearings(p)
-    print(result)
-    data_table_list.append(result)
+if os.path.exists("../SenateVideoFiles/Energy.csv") == True:
+    new_data = get_energy_hearings(page = 1)
+    old_data = pd.read_csv("../SenateVideoFiles/Energy.csv")
+    combined_data = pd.concat([new_data, old_data])
+    combined_data = combined_data.drop_duplicates("URL")
+    combined_data.to_csv("../SenateVideoFiles/Energy.csv")
 
-data_table_list_master = pd.concat(data_table_list)
-data_table_list_master.to_csv("../SenateVideoFiles/Energy.csv")
+else:
+    pages = [i for i in range(1, 17)]
+    data_table_list = []
+    for p in pages:
+        result = get_energy_hearings(p)
+        print(result)
+        data_table_list.append(result)
+
+    data_table_list_master = pd.concat(data_table_list)
+    data_table_list_master.to_csv("../SenateVideoFiles/Energy.csv")
