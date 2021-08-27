@@ -10,4 +10,4 @@ for f in files:
     data_frames.append(data_frame)
 
 data_frames = pd.concat(data_frames)
-data_frames.to_csv("./SenateVideoFiles/MasterFile.csv")
+data_frames.to_csv("./SenateVideoFiles/MasterFile.csv",  encoding='utf-8')

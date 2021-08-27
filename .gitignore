@@ -1,3 +1,5 @@
 *.env
 *.DS_STORE
 .DS_STORE
+cleanMasterFile.py
+MasterVideoToJson.py
