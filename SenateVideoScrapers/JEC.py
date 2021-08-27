@@ -1,6 +1,8 @@
 import requests
 from bs4 import BeautifulSoup
 import pandas as pd
+import os
+from datetime import datetime
 
 def get_JEC_hearings(year: int):
 
@@ -53,13 +55,28 @@ def get_JEC_hearings(year: int):
 
     return data_table
 
-#get_JEC_hearings()
-years = [i for i in range(2007, 2022)]
-data_table_list = []
-for y in years:
-    result = get_JEC_hearings(y)
-    print(result, y)
-    data_table_list.append(result)
+if os.path.exists("../SenateVideoFiles/JEC.csv") == True:
+    current_year =  datetime.today().year
+     years = [i for i in range(current_year, current_year + 1)]
+    data_table_list = []
+    for p in pages:
+        result = get_JEC_hearings(p)
+        print(result, p)
+        data_table_list.append(result)
+    new_data = pd.concat(data_table_list)
 
-data_table_list_master = pd.concat(data_table_list)
-data_table_list_master.to_csv("../SenateVideoFiles/JEC.csv")
+    old_data = pd.read_csv("../SenateVideoFiles/JEC.csv")
+    combined_data = pd.concat([new_data, old_data])
+    combined_data = combined_data.drop_duplicates("URL")
+    combined_data.to_csv("../SenateVideoFiles/JEC.csv")
+
+else:
+    years = [i for i in range(2007, 2022)]
+    data_table_list = []
+    for y in years:
+        result = get_JEC_hearings(y)
+        print(result, y)
+        data_table_list.append(result)
+
+    data_table_list_master = pd.concat(data_table_list)
+    data_table_list_master.to_csv("../SenateVideoFiles/JEC.csv")

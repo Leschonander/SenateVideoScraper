@@ -1,7 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 import pandas as pd
-
+import os
 
 def get_indian_affairs_hearings(page: int):
 
@@ -48,12 +48,27 @@ def get_indian_affairs_hearings(page: int):
     
     return data_table
 
-pages = [i for i in range(0, 49)]
-data_table_list = []
-for p in pages:
-    result = get_indian_affairs_hearings(p)
-    print(result)
-    data_table_list.append(result)
+if os.path.exists("../SenateVideoFiles/IndianAffairs.csv") == True:
+    pages = [i for i in range(1, 2)]
+    data_table_list = []
+    for p in pages:
+        result = get_indian_affairs_hearings(p)
+        print(result, p)
+        data_table_list.append(result)
+    new_data = pd.concat(data_table_list)
 
-data_table_list_master = pd.concat(data_table_list)
-data_table_list_master.to_csv("../SenateVideoFiles/IndianAffairs.csv")
+    old_data = pd.read_csv("../SenateVideoFiles/IndianAffairs.csv")
+    combined_data = pd.concat([new_data, old_data])
+    combined_data = combined_data.drop_duplicates("URL")
+    combined_data.to_csv("../SenateVideoFiles/IndianAffairs.csv")
+
+else:
+    pages = [i for i in range(0, 49)]
+    data_table_list = []
+    for p in pages:
+        result = get_indian_affairs_hearings(p)
+        print(result)
+        data_table_list.append(result)
+
+    data_table_list_master = pd.concat(data_table_list)
+    data_table_list_master.to_csv("../SenateVideoFiles/IndianAffairs.csv")
