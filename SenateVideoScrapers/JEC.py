@@ -57,7 +57,7 @@ def get_JEC_hearings(year: int):
 
 if os.path.exists("../SenateVideoFiles/JEC.csv") == True:
     current_year =  datetime.today().year
-     years = [i for i in range(current_year, current_year + 1)]
+    years = [i for i in range(current_year, current_year + 1)]
     data_table_list = []
     for p in pages:
         result = get_JEC_hearings(p)
