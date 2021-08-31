@@ -2,7 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 import pandas as pd
 import os
-from datetine import datetime
+from datetime import datetime
 
 def get_commerce_hearings(year: int):
 
@@ -67,8 +67,8 @@ if os.path.exists("../SenateVideoFiles/Commerce.csv") == True:
     combined_data = combined_data.drop_duplicates("URL")
     combined_data.to_csv("../SenateVideoFiles/Commerce.csv")
 else:
-    years = [i for i in range(2003, 2022)]
-
+    current_year =  datetime.today().year
+    years = [i for i in range(2003, current_year + 1)]
     data_table_list = []
     for y in years:
         result = get_commerce_hearings(y)

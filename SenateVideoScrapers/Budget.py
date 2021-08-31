@@ -3,7 +3,7 @@ from bs4 import BeautifulSoup
 import pandas as pd
 import os
 
-def get_budget_hearings(page):
+def get_budget_hearings(page: int):
 
     url = "https://www.budget.senate.gov/hearings?PageNum_rs=" + str(page)
     res = requests.get(url)

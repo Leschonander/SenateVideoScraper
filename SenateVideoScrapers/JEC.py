@@ -71,7 +71,8 @@ if os.path.exists("../SenateVideoFiles/JEC.csv") == True:
     combined_data.to_csv("../SenateVideoFiles/JEC.csv")
 
 else:
-    years = [i for i in range(2007, 2022)]
+    current_year =  datetime.today().year
+    years = [i for i in range(2007, current_year + 1)]
     data_table_list = []
     for y in years:
         result = get_JEC_hearings(y)
