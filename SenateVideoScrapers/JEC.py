@@ -23,10 +23,11 @@ def get_JEC_hearings(year: int):
             url = ""
         else:
             title = t.find('h1', {'class': 'title'}).get_text()
-        
-        if  t.find("span", {'class': "date"}) == None:
-            date = ""
             url = t.find('h1', {'class': 'title'}).find('a')['href']
+
+        
+        if t.find("span", {'class': "date"}) == None:
+            date = ""
         else:
             date = t.find("span", {'class': "date"}).get_text().replace("\n", "")
         
@@ -45,7 +46,12 @@ def get_JEC_hearings(year: int):
         if d["URL"] == "":
              d["video_url"] = ""
         else:
-            res_ind = requests.get(d["URL"])
+            headers = {
+                    'User-Agent': 'My User Agent 1.0',
+                    'From': 'https://github.com/Leschonander/SenateVideoScraper'  
+            }
+
+            res_ind = requests.get(d["URL"], headers=headers)
             soup_ind = BeautifulSoup(res_ind.text,'html.parser')
             
             if soup_ind.find('iframe') == None:
@@ -59,20 +65,20 @@ def get_JEC_hearings(year: int):
 
     return data_table
 
-if os.path.exists("../SenateVideoFiles/JEC.csv") == True:
+if os.path.exists("./SenateVideoFiles/JEC.csv") == True:
     current_year =  datetime.today().year
     years = [i for i in range(current_year, current_year + 1)]
     data_table_list = []
-    for p in current_year:
+    for p in years:
         result = get_JEC_hearings(p)
         print(result, p)
         data_table_list.append(result)
     new_data = pd.concat(data_table_list)
 
-    old_data = pd.read_csv("../SenateVideoFiles/JEC.csv")
+    old_data = pd.read_csv("./SenateVideoFiles/JEC.csv")
     combined_data = pd.concat([new_data, old_data])
     combined_data = combined_data.drop_duplicates("URL")
-    combined_data.to_csv("../SenateVideoFiles/JEC.csv")
+    combined_data.to_csv("./SenateVideoFiles/JEC.csv")
 
 else:
     current_year =  datetime.today().year
@@ -80,8 +86,8 @@ else:
     data_table_list = []
     for y in years:
         result = get_JEC_hearings(y)
-        print(result, y)
+        print(result)
         data_table_list.append(result)
 
     data_table_list_master = pd.concat(data_table_list)
-    data_table_list_master.to_csv("../SenateVideoFiles/JEC.csv")
+    data_table_list_master.to_csv("./SenateVideoFiles/JEC.csv")

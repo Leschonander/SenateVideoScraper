@@ -67,8 +67,7 @@ def get_agricultural_hearings(rows: int):
 
     return data_table
 
-# get_agricultural_hearings(rows=5000).to_csv("../SenateVideoFiles/Agricultural.csv")
-if os.path.exists("../SenateVideoFiles/Agricultural.csv") == True:
+if os.path.exists("./SenateVideoFiles/Agricultural.csv") == True:
     new_data = get_agricultural_hearings(rows=10)
     old_data = pd.read_csv("../SenateVideoFiles/Agricultural.csv")
     combined_data = pd.concat([new_data, old_data])

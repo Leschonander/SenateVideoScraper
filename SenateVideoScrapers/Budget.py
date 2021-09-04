@@ -63,7 +63,7 @@ def get_budget_hearings(page: int):
 
     return data_table
 
-if os.path.exists("../SenateVideoFiles/Budget.csv") == True:
+if os.path.exists("./SenateVideoFiles/Budget.csv") == True:
     new_data = get_budget_hearings(page = 1)
     old_data = pd.read_csv("../SenateVideoFiles/Budget.csv")
     combined_data = pd.concat([new_data, old_data])

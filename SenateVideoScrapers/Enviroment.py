@@ -66,7 +66,7 @@ def get_enviroment_hearings(page: int):
 
     return data_table
 
-if os.path.exists("../SenateVideoFiles/Enviroment.csv") == True:
+if os.path.exists("./SenateVideoFiles/Enviroment.csv") == True:
     pages = [i for i in range(1, 2)]
     data_table_list = []
     for p in pages:

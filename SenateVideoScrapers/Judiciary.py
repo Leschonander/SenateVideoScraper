@@ -72,7 +72,7 @@ def get_judiciary_hearings(rows: int):
     data_table = pd.DataFrame(data)
     return data_table
 
-if os.path.exists("../SenateVideoFiles/Judiciary.csv") == True:
+if os.path.exists("./SenateVideoFiles/Judiciary.csv") == True:
     new_data = get_judiciary_hearings(rows=10)
     old_data = pd.read_csv("../SenateVideoFiles/Judiciary.csv")
     combined_data = pd.concat([new_data, old_data])

@@ -62,7 +62,7 @@ def get_commerce_hearings(year: int):
     
     return data_table
 
-if os.path.exists("../SenateVideoFiles/Commerce.csv") == True:
+if os.path.exists("./SenateVideoFiles/Commerce.csv") == True:
     year = datetime.today().year
     new_data = get_commerce_hearings(year)
     old_data = pd.read_csv("../SenateVideoFiles/Commerce.csv")

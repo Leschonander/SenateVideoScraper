@@ -66,7 +66,7 @@ def get_appropriations_hearings(rows: int):
     print(data_table)
     return data_table
     
-if os.path.exists("../SenateVideoFiles/Approporiations.csv") == True:
+if os.path.exists("./SenateVideoFiles/Approporiations.csv") == True:
     new_data = get_appropriations_hearings(rows=10)
     old_data = pd.read_csv("../SenateVideoFiles/Approporiations.csv")
     combined_data = pd.concat([new_data, old_data])

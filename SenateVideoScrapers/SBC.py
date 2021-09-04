@@ -62,7 +62,7 @@ def get_SBC_hearings(page: int):
 
     return data_table
 
-if os.path.exists("../SenateVideoFiles/SBC.csv") == True:
+if os.path.exists("./SenateVideoFiles/SBC.csv") == True:
     pages = [i for i in range(1, 2)]
     data_table_list = []
     for p in pages:

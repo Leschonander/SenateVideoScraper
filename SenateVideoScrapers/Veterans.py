@@ -68,7 +68,7 @@ def get_veterans_hearings(rows: int):
 
     return data_table
 
-if os.path.exists("../SenateVideoFiles/Veterans.csv") == True:
+if os.path.exists("./SenateVideoFiles/Veterans.csv") == True:
     new_data = get_veterans_hearings(rows=10)
     old_data = pd.read_csv("../SenateVideoFiles/Veterans.csv")
     combined_data = pd.concat([new_data, old_data])
