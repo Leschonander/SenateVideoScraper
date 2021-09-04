@@ -6,7 +6,11 @@ import os
 def get_banking_hearings(rows: int):
 
     url = "https://www.banking.senate.gov/hearings?maxrows=" + str(rows)
-    res = requests.get(url)
+    headers = {
+        'User-Agent': 'My User Agent 1.0',
+        'From': 'https://github.com/Leschonander/SenateVideoScraper'  
+    }
+    res = requests.get(url, headers=headers)
 
     soup =  BeautifulSoup(res.text,'html.parser')
 

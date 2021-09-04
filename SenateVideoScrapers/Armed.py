@@ -6,7 +6,11 @@ import os
 def get_armed_hearings(rows: int):
 
     url = "https://www.armed-services.senate.gov/hearings?c=all&maxrows=" + str(rows)
-    res = requests.get(url)
+    headers = {
+        'User-Agent': 'My User Agent 1.0',
+        'From': 'https://github.com/Leschonander/SenateVideoScraper'  
+    }
+    res = requests.get(url, headers=headers)
 
     soup =  BeautifulSoup(res.text,'html.parser')
 

@@ -7,8 +7,11 @@ from datetime import datetime
 def get_commerce_hearings(year: int):
 
     url = "https://www.commerce.senate.gov/hearings?month=&year=" + str(year)
-    res = requests.get(url)
-    print(url)
+    headers = {
+        'User-Agent': 'My User Agent 1.0',
+        'From': 'https://github.com/Leschonander/SenateVideoScraper'  
+    }
+    res = requests.get(url, headers=headers)
     soup =  BeautifulSoup(res.text,'html.parser')
     
     table_rows = soup.findAll('div', { 'class': 'element'})

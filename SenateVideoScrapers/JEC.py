@@ -7,7 +7,11 @@ from datetime import datetime
 def get_JEC_hearings(year: int):
 
     url = "https://www.jec.senate.gov/public/index.cfm/hearings-calendar?YearDisplay=" + str(year)
-    res = requests.get(url)
+    headers = {
+        'User-Agent': 'My User Agent 1.0',
+        'From': 'https://github.com/Leschonander/SenateVideoScraper'  
+    }
+    res = requests.get(url, headers=headers)
 
     soup =  BeautifulSoup(res.text,'html.parser')
     table_rows = soup.findAll('article', { 'class': 'clearfix'})

@@ -6,7 +6,11 @@ import os
 def get_enviroment_hearings(page: int):
 
     url = "https://www.epw.senate.gov/public/index.cfm/hearings?page=" + str(page)
-    res = requests.get(url)
+    headers = {
+        'User-Agent': 'My User Agent 1.0',
+        'From': 'https://github.com/Leschonander/SenateVideoScraper'  
+    }
+    res = requests.get(url, headers=headers)
 
     soup =  BeautifulSoup(res.text,'html.parser')
     table_rows = soup.findAll('tr')

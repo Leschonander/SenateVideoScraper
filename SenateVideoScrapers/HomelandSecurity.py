@@ -6,7 +6,11 @@ import os
 def get_homeland_security_hearings(page: int):
 
     url = f"https://www.hsgac.senate.gov/hearings?PageNum_rs={page}&c=all"
-    res = requests.get(url)
+    headers = {
+        'User-Agent': 'My User Agent 1.0',
+        'From': 'https://github.com/Leschonander/SenateVideoScraper'  
+    }
+    res = requests.get(url, headers=headers)
     
     soup =  BeautifulSoup(res.text,'html.parser')
    

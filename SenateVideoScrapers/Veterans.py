@@ -6,7 +6,11 @@ import os
 def get_veterans_hearings(rows: int):
 
     url = "https://www.veterans.senate.gov/hearings?c=all&maxrows=" + str(rows)
-    res = requests.get(url)
+    headers = {
+        'User-Agent': 'My User Agent 1.0',
+        'From': 'https://github.com/Leschonander/SenateVideoScraper'  
+    }
+    res = requests.get(url, headers=headers)
 
     soup =  BeautifulSoup(res.text,'html.parser')
     table_rows = soup.findAll('tr', { 'class': 'vevent'})

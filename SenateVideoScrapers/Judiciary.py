@@ -6,7 +6,11 @@ import os
 def get_judiciary_hearings(rows: int):
 
     url = "https://www.judiciary.senate.gov/hearings?maxrows=" + str(rows)
-    res = requests.get(url)
+    headers = {
+        'User-Agent': 'My User Agent 1.0',
+        'From': 'https://github.com/Leschonander/SenateVideoScraper'  
+    }
+    res = requests.get(url, headers=headers)
 
     soup =  BeautifulSoup(res.text,'html.parser')
     table_rows = soup.findAll('tr', { 'class': 'vevent'})
