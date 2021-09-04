@@ -68,10 +68,10 @@ def get_appropriations_hearings(rows: int):
     
 if os.path.exists("./SenateVideoFiles/Approporiations.csv") == True:
     new_data = get_appropriations_hearings(rows=10)
-    old_data = pd.read_csv("../SenateVideoFiles/Approporiations.csv")
+    old_data = pd.read_csv("./SenateVideoFiles/Approporiations.csv")
     combined_data = pd.concat([new_data, old_data])
     combined_data = combined_data.drop_duplicates("URL")
-    combined_data.to_csv("../SenateVideoFiles/Approporiations.csv")
+    combined_data.to_csv("./SenateVideoFiles/Approporiations.csv")
 else: 
     get_appropriations_hearings(rows=4000).to_csv("../SenateVideoFiles/Approporiations.csv")
 

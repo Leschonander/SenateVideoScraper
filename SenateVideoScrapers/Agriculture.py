@@ -69,9 +69,9 @@ def get_agricultural_hearings(rows: int):
 
 if os.path.exists("./SenateVideoFiles/Agricultural.csv") == True:
     new_data = get_agricultural_hearings(rows=10)
-    old_data = pd.read_csv("../SenateVideoFiles/Agricultural.csv")
+    old_data = pd.read_csv("./SenateVideoFiles/Agricultural.csv")
     combined_data = pd.concat([new_data, old_data])
     combined_data = combined_data.drop_duplicates("URL")
-    combined_data.to_csv("../SenateVideoFiles/Agricultural.csv")
+    combined_data.to_csv("./SenateVideoFiles/Agricultural.csv")
 else: 
     get_agricultural_hearings(rows=5000).to_csv("../SenateVideoFiles/Agricultural.csv")

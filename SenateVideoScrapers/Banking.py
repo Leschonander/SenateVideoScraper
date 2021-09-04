@@ -70,9 +70,9 @@ def get_banking_hearings(rows: int):
 
 if os.path.exists("./SenateVideoFiles/Banking.csv") == True:
     new_data = get_banking_hearings(rows=10)
-    old_data = pd.read_csv("../SenateVideoFiles/Banking.csv")
+    old_data = pd.read_csv("./SenateVideoFiles/Banking.csv")
     combined_data = pd.concat([new_data, old_data])
     combined_data = combined_data.drop_duplicates("URL")
-    combined_data.to_csv("../SenateVideoFiles/Banking.csv")
+    combined_data.to_csv("./SenateVideoFiles/Banking.csv")
 else: 
     get_banking_hearings(rows = 2000).to_csv("../SenateVideoFiles/Banking.csv")

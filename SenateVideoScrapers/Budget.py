@@ -65,10 +65,10 @@ def get_budget_hearings(page: int):
 
 if os.path.exists("./SenateVideoFiles/Budget.csv") == True:
     new_data = get_budget_hearings(page = 1)
-    old_data = pd.read_csv("../SenateVideoFiles/Budget.csv")
+    old_data = pd.read_csv("./SenateVideoFiles/Budget.csv")
     combined_data = pd.concat([new_data, old_data])
     combined_data = combined_data.drop_duplicates("URL")
-    combined_data.to_csv("../SenateVideoFiles/Budget.csv")
+    combined_data.to_csv("./SenateVideoFiles/Budget.csv")
 else: 
 
     pages = [i for i in range(1, 15)]
@@ -79,4 +79,4 @@ else:
         data_table_list.append(result)
 
     data_table_list_master = pd.concat(data_table_list)
-    data_table_list_master.to_csv("../SenateVideoFiles/Budget.csv")
+    data_table_list_master.to_csv("./SenateVideoFiles/Budget.csv")

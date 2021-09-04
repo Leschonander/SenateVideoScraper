@@ -65,10 +65,10 @@ def get_commerce_hearings(year: int):
 if os.path.exists("./SenateVideoFiles/Commerce.csv") == True:
     year = datetime.today().year
     new_data = get_commerce_hearings(year)
-    old_data = pd.read_csv("../SenateVideoFiles/Commerce.csv")
+    old_data = pd.read_csv("./SenateVideoFiles/Commerce.csv")
     combined_data = pd.concat([new_data, old_data])
     combined_data = combined_data.drop_duplicates("URL")
-    combined_data.to_csv("../SenateVideoFiles/Commerce.csv")
+    combined_data.to_csv("./SenateVideoFiles/Commerce.csv")
 else:
     current_year =  datetime.today().year
     years = [i for i in range(2003, current_year + 1)]
@@ -79,4 +79,4 @@ else:
         data_table_list.append(result)
 
     data_table_list_master = pd.concat(data_table_list)
-    data_table_list_master.to_csv("../SenateVideoFiles/Commerce.csv")
+    data_table_list_master.to_csv("./SenateVideoFiles/Commerce.csv")

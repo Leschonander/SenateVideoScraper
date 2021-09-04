@@ -68,10 +68,10 @@ def get_armed_hearings(rows: int):
 
 if os.path.exists("./SenateVideoFiles/Armed.csv") == True:
     new_data = get_armed_hearings(rows=10)
-    old_data = pd.read_csv("../SenateVideoFiles/Armed.csv")
+    old_data = pd.read_csv("./SenateVideoFiles/Armed.csv")
     combined_data = pd.concat([new_data, old_data])
     combined_data = combined_data.drop_duplicates("URL")
-    combined_data.to_csv("../SenateVideoFiles/Armed.csv")
+    combined_data.to_csv("./SenateVideoFiles/Armed.csv")
 else: 
     get_armed_hearings(rows=5000).to_csv("../SenateVideoFiles/Armed.csv")
 
