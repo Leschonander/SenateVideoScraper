@@ -2,6 +2,8 @@ import requests
 from bs4 import BeautifulSoup
 import pandas as pd
 import os 
+from datetime import datetime
+
 
 def get_armed_hearings(rows: int):
 
@@ -42,7 +44,8 @@ def get_armed_hearings(rows: int):
             "URL": url,
             "Title": title,
             "Location": location,
-            "Committee": "Armed"
+            "Committee": "Armed",
+            "Date Scraped": datetime.today().strftime("%Y-%m-%d")
         }
 
         data.append(row_obj)
@@ -73,6 +76,6 @@ if os.path.exists("./SenateVideoFiles/Armed.csv") == True:
     combined_data = combined_data.drop_duplicates("URL")
     combined_data.to_csv("./SenateVideoFiles/Armed.csv")
 else: 
-    get_armed_hearings(rows=5000).to_csv("../SenateVideoFiles/Armed.csv")
+    get_armed_hearings(rows=5000).to_csv("./SenateVideoFiles/Armed.csv")
 
 

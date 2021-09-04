@@ -2,6 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 import pandas as pd
 import os
+from datetime import datetime
 
 def get_rules_hearings(rows: int):
 
@@ -36,7 +37,8 @@ def get_rules_hearings(rows: int):
             "URL": "https://www.rules.senate.gov" + t.find("a", {'class': 'url'})["href"],
             "Title":  t.find("a", {'class': 'url'}).get_text().replace("\n", "").replace("\t", ""),
             "Location": location,
-            "Committee": "Rules"
+            "Committee": "Rules",
+            "Date Scraped": datetime.today().strftime("%Y-%m-%d")
         }
 
         data.append(row_obj)
@@ -66,4 +68,4 @@ if os.path.exists("./SenateVideoFiles/Rules.csv") == True:
     combined_data = combined_data.drop_duplicates("URL")
     combined_data.to_csv("../SenateVideoFiles/Rules.csv")
 else: 
-    get_rules_hearings(rows=5000).to_csv("../SenateVideoFiles/Rules.csv")
+    get_rules_hearings(rows=5000).to_csv("./SenateVideoFiles/Rules.csv")

@@ -3,6 +3,7 @@ import requests
 from bs4 import BeautifulSoup
 import pandas as pd
 import os
+from datetime import datetime
 
 def get_agricultural_hearings(rows: int):
 
@@ -43,7 +44,8 @@ def get_agricultural_hearings(rows: int):
             "URL": url,
             "Title": title,
             "Location": location,
-            "Committee": "Agriculture"
+            "Committee": "Agriculture",
+            "Date Scraped": datetime.today().strftime("%Y-%m-%d")
         }
         
         data.append(row_obj)
@@ -61,7 +63,7 @@ def get_agricultural_hearings(rows: int):
                 video_url =  "https://www.agriculture.senate.gov" + soup_ind.find('a', { 'id': 'watch-live-now'})["href"].replace("javascript:openVideoWin('", "").replace("');", "")
             
             d["video_url"] = video_url
-    
+        print(d)
     data_table = pd.DataFrame(data)
     print(data_table)
 
@@ -74,4 +76,4 @@ if os.path.exists("./SenateVideoFiles/Agricultural.csv") == True:
     combined_data = combined_data.drop_duplicates("URL")
     combined_data.to_csv("./SenateVideoFiles/Agricultural.csv")
 else: 
-    get_agricultural_hearings(rows=5000).to_csv("../SenateVideoFiles/Agricultural.csv")
+    get_agricultural_hearings(rows=5000).to_csv("./SenateVideoFiles/Agricultural.csv")

@@ -2,6 +2,8 @@ import requests
 from bs4 import BeautifulSoup
 import pandas as pd
 import os
+from datetime import datetime
+
 
 def get_health_hearings(rows: int):
 
@@ -43,7 +45,8 @@ def get_health_hearings(rows: int):
             "URL": url,
             "Title": title,
             "Location": location,
-            "Committee": "Health"
+            "Committee": "Health",
+            "Date Scraped": datetime.today().strftime("%Y-%m-%d")
         }
 
         data.append(row_obj)

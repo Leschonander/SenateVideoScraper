@@ -2,6 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 import pandas as pd
 import os
+from datetime import datetime
 
 def get_SBC_hearings(page: int):
 
@@ -39,7 +40,8 @@ def get_SBC_hearings(page: int):
             "URL": url,
             "Title": title,
             "Location": "",
-            "Committee": "SBC"
+            "Committee": "SBC",
+            "Date Scraped": datetime.today().strftime("%Y-%m-%d")
         }
 
         data.append(row_obj)

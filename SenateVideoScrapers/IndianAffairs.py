@@ -29,7 +29,8 @@ def get_indian_affairs_hearings(page: int):
             "URL": "https://www.indian.senate.gov/" + t.findAll("a")[0]["href"],
             "Title": t.findAll("a")[0].get_text().replace("\n", "").rstrip().replace("\t", ""),
             "Location": location,
-            "Committee": "Indian Affairs"
+            "Committee": "Indian Affairs",
+            "Date Scraped": datetime.today().strftime("%Y-%m-%d")
         }
         data.append(row_obj)
     

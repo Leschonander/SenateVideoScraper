@@ -2,6 +2,8 @@ import requests
 from bs4 import BeautifulSoup
 import pandas as pd
 import os
+from datetime import datetime
+
 
 def get_intelligence_hearings(page: int):
 
@@ -31,7 +33,8 @@ def get_intelligence_hearings(page: int):
             "URL": "https://www.intelligence.senate.gov/" + t.findAll("a")[0]["href"],
             "Title": t.findAll("a")[0].get_text().replace("\n", "").rstrip().replace("\t", ""),
             "Location": "",
-            "Committee": "Intelligence"
+            "Committee": "Intelligence",
+            "Date Scraped": datetime.today().strftime("%Y-%m-%d")
         }
 
         data.append(row_obj)

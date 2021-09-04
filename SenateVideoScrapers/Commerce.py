@@ -39,7 +39,8 @@ def get_commerce_hearings(year: int):
             "URL": url,
             "Title": title,
             "Location": "",
-            "Committee": "Commerce"
+            "Committee": "Commerce",
+            "Date Scraped": datetime.today().strftime("%Y-%m-%d")
         }
         
         data.append(row_obj)

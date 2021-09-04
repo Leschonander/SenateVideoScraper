@@ -37,7 +37,8 @@ def get_JEC_hearings(year: int):
             "URL": url,
             "Title":title,
             "Location": "",
-            "Committee": "JEC"
+            "Committee": "JEC",
+            "Date Scraped": datetime.today().strftime("%Y-%m-%d")
         }
         
         data.append(row_obj)

@@ -2,6 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 import pandas as pd
 import os
+from datetime import datetime
 
 def get_judiciary_hearings(rows: int):
 
@@ -52,7 +53,8 @@ def get_judiciary_hearings(rows: int):
             "URL": url,
             "Title": title,
             "Location": location,
-            "Committee": "Judiciary"
+            "Committee": "Judiciary",
+            "Date Scraped": datetime.today().strftime("%Y-%m-%d")
         }
         data.append(row_obj)
     

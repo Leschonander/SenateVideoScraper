@@ -2,6 +2,8 @@ import requests
 from bs4 import BeautifulSoup
 import pandas as pd
 import os
+from datetime import datetime
+
 
 def get_budget_hearings(page: int):
 
@@ -39,7 +41,8 @@ def get_budget_hearings(page: int):
             "URL": url,
             "Title": title,
             "Location": location,
-            "Committee": "Budget"
+            "Committee": "Budget",
+            "Date Scraped": datetime.today().strftime("%Y-%m-%d")
         }
         
         data.append(row_obj)
