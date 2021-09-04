@@ -13,14 +13,17 @@ def get_homeland_security_hearings(page: int):
     res = requests.get(url, headers=headers)
     
     soup =  BeautifulSoup(res.text,'html.parser')
-   
+    
     table_rows = soup.findAll('tr', { 'class': 'vevent'})
     data = []
     for t in table_rows:
         if t.find('time', {'class': 'dtstart'}) == None:
             date = ""
+            time = ""
         else:
-            date = t.find('time', {'class': 'dtstart'}).get_text()
+            date_time = t.find('time', {'class': 'dtstart'}).get_text().split(" ")
+            date =  date_time[0]
+            time = date_time[1]
         
         if t.find('a', {'class': 'summary'}) == None:
             url = ""
@@ -36,7 +39,7 @@ def get_homeland_security_hearings(page: int):
         
         row_obj = {
             "Date": date,
-            "Time": "",
+            "Time": time,
             "URL": url,
             "Title": title,
             "Location": location,

@@ -1,7 +1,13 @@
 import pandas as pd
 import os
 
-# os.system('python my_file.py')
+# This is the base case, that you want all files. Warning if you are 
+# setting it up for the first time, it may take sometime
+scripts = os.listdir("./SenateVideoScrapers")
+for s in scripts:
+    file_path = "./SenateVideoScrapers/" + s
+    os.system(f"python3 {file_path}")
+
 
 files = os.listdir("./SenateVideoFiles")
 data_frames = []
