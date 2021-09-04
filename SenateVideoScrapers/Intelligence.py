@@ -40,7 +40,7 @@ def get_intelligence_hearings(page: int):
         if d["URL"] == "":
             d["video_url"] = ""
         else:
-            res_ind = requests.get(d["URL"])
+            res_ind = requests.get(d["URL"], headers=headers)
             soup_ind = BeautifulSoup(res_ind.text,'html.parser')
             
             if soup_ind.find('iframe') == None:

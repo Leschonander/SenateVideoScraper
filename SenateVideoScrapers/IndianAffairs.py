@@ -34,7 +34,7 @@ def get_indian_affairs_hearings(page: int):
         data.append(row_obj)
     
     for d in data:
-        res_ind = requests.get(d["URL"])
+        res_ind = requests.get(d["URL"], headers=headers)
         soup_ind = BeautifulSoup(res_ind.text,'html.parser')
         if soup_ind.find('div', { 'class': 'field-name-field-hearing-new-video'}) == None:
             video_url  = ""

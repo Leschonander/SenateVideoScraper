@@ -46,10 +46,6 @@ def get_JEC_hearings(year: int):
         if d["URL"] == "":
              d["video_url"] = ""
         else:
-            headers = {
-                    'User-Agent': 'My User Agent 1.0',
-                    'From': 'https://github.com/Leschonander/SenateVideoScraper'  
-            }
 
             res_ind = requests.get(d["URL"], headers=headers)
             soup_ind = BeautifulSoup(res_ind.text,'html.parser')
