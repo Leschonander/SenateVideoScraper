@@ -63,9 +63,9 @@ def get_rules_hearings(rows: int):
 
 if os.path.exists("./SenateVideoFiles/Rules.csv") == True:
     new_data = get_rules_hearings(rows=10)
-    old_data = pd.read_csv("../SenateVideoFiles/Rules.csv")
+    old_data = pd.read_csv("./SenateVideoFiles/Rules.csv")
     combined_data = pd.concat([new_data, old_data])
     combined_data = combined_data.drop_duplicates("URL")
-    combined_data.to_csv("../SenateVideoFiles/Rules.csv")
+    combined_data.to_csv("./SenateVideoFiles/Rules.csv",  encoding='utf-8')
 else: 
-    get_rules_hearings(rows=5000).to_csv("./SenateVideoFiles/Rules.csv")
+    get_rules_hearings(rows=5000).to_csv("./SenateVideoFiles/Rules.csv",  encoding='utf-8')

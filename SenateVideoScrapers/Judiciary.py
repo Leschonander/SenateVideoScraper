@@ -79,6 +79,6 @@ if os.path.exists("./SenateVideoFiles/Judiciary.csv") == True:
     old_data = pd.read_csv("./SenateVideoFiles/Judiciary.csv")
     combined_data = pd.concat([new_data, old_data])
     combined_data = combined_data.drop_duplicates("URL")
-    combined_data.to_csv("./SenateVideoFiles/Judiciary.csv")
+    combined_data.to_csv("./SenateVideoFiles/Judiciary.csv",  encoding='utf-8')
 else: 
-    get_judiciary_hearings(rows=2000).to_csv("./SenateVideoFiles/Judiciary.csv")
+    get_judiciary_hearings(rows=2000).to_csv("./SenateVideoFiles/Judiciary.csv",  encoding='utf-8')

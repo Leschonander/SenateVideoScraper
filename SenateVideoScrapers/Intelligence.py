@@ -69,7 +69,7 @@ if os.path.exists("./SenateVideoFiles/Intelligence.csv") == True:
     old_data = pd.read_csv("./SenateVideoFiles/Intelligence.csv")
     combined_data = pd.concat([new_data, old_data])
     combined_data = combined_data.drop_duplicates("URL")
-    combined_data.to_csv("./SenateVideoFiles/Intelligence.csv")
+    combined_data.to_csv("./SenateVideoFiles/Intelligence.csv",  encoding='utf-8')
 else:
 
     pages = [i for i in range(0, 44)]
@@ -80,4 +80,4 @@ else:
         data_table_list.append(result)
 
     data_table_list_master = pd.concat(data_table_list)
-    data_table_list_master.to_csv("./SenateVideoFiles/Intelligence.csv")
+    data_table_list_master.to_csv("./SenateVideoFiles/Intelligence.csv",  encoding='utf-8')
