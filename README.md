@@ -2,7 +2,7 @@
 
 ## About
 
-Surprisingly, there is central repository for past Senate Hearings across all committees. There are tables on each website for each individual
+Surprisingly, there is not a central repository for past Senate Hearings across all committees. There are tables on each website for each individual
 committee, but not one that contains all the hearings. This project intends to change that. By collecting links to all the videos for various hearings, 
 it should make it easier to search for a given hearing vs navigating a given comittees website. 
 
