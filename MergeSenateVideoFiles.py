@@ -3,6 +3,7 @@ import os
 
 # This is the base case, that you want all files. Warning if you are 
 # setting it up for the first time, it may take sometime
+
 scripts = os.listdir("./SenateVideoScrapers")
 for s in scripts:
     file_path = "./SenateVideoScrapers/" + s
@@ -18,5 +19,6 @@ for f in files:
     data_frames.append(data_frame)
 
 data_frames = pd.concat(data_frames)
-print(data_frames)
+data_frames = data_frames[["Date","Time","URL","Title","Location","Committee","Date Scraped","video_url"]]
+
 data_frames.to_csv("./SenateVideoFiles/MasterFile.csv",  encoding='utf-8', index=False)
