@@ -8,7 +8,6 @@ it should make it easier to search for a given hearing vs navigating a given com
 
 Within `senateVideos`, there is a CSV file for each major Senate committee, along with `MasterFile.csv` which is a combination of all those other files. 
 
-
 ## Requirements
 
 A `requirments.txt` file is linked in the repository. While more then 3 packages are listed, the main 3 packages
