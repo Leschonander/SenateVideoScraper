@@ -70,6 +70,7 @@ def get_judiciary_hearings(rows: int):
                 video_url =  "https://www.judiciary.senate.gov" + soup_ind.find('a', { 'id': 'watch-live-now'})["href"].replace("javascript:openVideoWin('", "").replace("');", "")
             
         d["video_url"] = video_url
+        print(d)
     
     data_table = pd.DataFrame(data)
     return data_table

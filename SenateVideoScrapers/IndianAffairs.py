@@ -2,6 +2,8 @@ import requests
 from bs4 import BeautifulSoup
 import pandas as pd
 import os
+from datetime import datetime
+
 
 def get_indian_affairs_hearings(page: int):
 
@@ -72,7 +74,7 @@ else:
     data_table_list = []
     for p in pages:
         result = get_indian_affairs_hearings(p)
-        print(result)
+        print(result, p)
         data_table_list.append(result)
 
     data_table_list_master = pd.concat(data_table_list)

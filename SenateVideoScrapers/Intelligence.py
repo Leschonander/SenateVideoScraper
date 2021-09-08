@@ -76,7 +76,7 @@ else:
     data_table_list = []
     for p in pages:
         result = get_intelligence_hearings(p)
-        print(result)
+        print(result, p)
         data_table_list.append(result)
 
     data_table_list_master = pd.concat(data_table_list)

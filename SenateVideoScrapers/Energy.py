@@ -22,6 +22,11 @@ def get_energy_hearings(page: int):
             date = ""
         else:
             date = t.find('span', {'class': 'element-date'}).get_text()
+            if t.find('a') != None:
+                url_for_year = t.find('a')["href"].split("/")
+                nums = [int(e) for e in url_for_year if e.isdigit()]
+                year = nums[0]
+                date = date + " " + str(year)
         
         if t.find('span', {'class': 'element-time'}) == None:
             time = ""
@@ -64,6 +69,8 @@ def get_energy_hearings(page: int):
                 video_url =  soup_ind.find('iframe', { 'class': 'embed-responsive-item'})["src"]
         
             d["video_url"] = video_url
+        
+        print(d)
     
     data_table = pd.DataFrame(data)
 

@@ -60,6 +60,8 @@ def get_SBC_hearings(page: int):
                 video_url =  soup_ind.find('iframe', { 'class': 'embed-responsive-item'})["src"]
         
             d["video_url"] = video_url
+        
+        print(d)
     
     data_table = pd.DataFrame(data)
 
@@ -84,6 +86,7 @@ else:
     data_table_list = []
     for p in pages:
         result = get_SBC_hearings(p)
+        print(result)
         data_table_list.append(result)
 
     data_table_list_master = pd.concat(data_table_list)

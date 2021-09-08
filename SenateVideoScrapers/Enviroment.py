@@ -84,7 +84,7 @@ if os.path.exists("./SenateVideoFiles/Enviroment.csv") == True:
     combined_data.to_csv("./SenateVideoFiles/Enviroment.csv",  encoding='utf-8')
 
 else: 
-    pages = [i for i in range(1, 23)]
+    pages = [i for i in range(1, 71)]
     data_table_list = []
     for p in pages:
         result = get_enviroment_hearings(p)
