@@ -1,6 +1,5 @@
 import pandas as pd
 import numpy as np
-import re
 import os
 
 master_file_data_frame = pd.read_csv("./SenateVideoFiles/MasterFile.csv")
@@ -15,8 +14,6 @@ for f in gov_info_senate_hearing_files:
 total_gov_info_senate_hearing = pd.concat(total_gov_info_senate_hearing)
 total_gov_info_senate_hearing = total_gov_info_senate_hearing.rename(columns={"title": "Title"})
 
-master_file_data_frame['Title'] = master_file_data_frame['Title'].str.replace('"', '')
-
 title_queries = [
     (master_file_data_frame['Title'].str.contains('Full Committee hearing entitled', case=False, regex=False, na=False), master_file_data_frame['Title'].str.replace('Full Committee hearing entitled', '').str.replace('“', '').str.replace('.”', '')),
     (master_file_data_frame['Title'].str.contains('Full Committee Hearing entitled,', case=False, regex=False, na=False), master_file_data_frame['Title'].str.replace('Full Committee Hearing entitled', '').str.replace('“', '').str.replace('.”', '')),
@@ -29,17 +26,26 @@ title_queries = [
     (master_file_data_frame['Title'].str.contains('CANCELLED', case=False, regex=False, na=False), master_file_data_frame['Title'].str.replace('CANCELLED', '').replace(':', '')),
     (master_file_data_frame['Title'].str.contains('Full Committee Hearing:', case=False, regex=False, na=False), master_file_data_frame['Title'].str.replace('Full Committee Hearing:', '').replace(':', '')),
     (master_file_data_frame['Title'].str.contains('Field Hearing:', case=False, regex=False, na=False), master_file_data_frame['Title'].str.replace('Field Hearing:', '').replace(':', '')),
+    (master_file_data_frame['Title'].str.contains('Oversight : ', case=False, regex=False, na=False), master_file_data_frame['Title'].str.replace('Oversight : ', '')),
+    (master_file_data_frame['Title'].str.contains('JEC Hearing: ', case=False, regex=False, na=False), master_file_data_frame['Title'].str.replace('JEC Hearing: ', '')),
+    (master_file_data_frame['Title'].str.contains('JEC HEARING:', case=False, regex=False, na=False), master_file_data_frame['Title'].str.replace('JEC HEARING: ', '')),
+    (master_file_data_frame['Title'].str.contains('JEC Hearing - ', case=False, regex=False, na=False), master_file_data_frame['Title'].str.replace('JEC Hearing - ', '')),
+    (master_file_data_frame['Title'].str.contains('Hearing:', case=False, regex=False, na=False), master_file_data_frame['Title'].str.replace('Hearing:', '')),
+    (master_file_data_frame['Title'].str.contains('Hearing on Nomination', case=False, regex=False, na=False), master_file_data_frame['Title'].str.replace('.', '')),
+    (master_file_data_frame['Title'].str.contains('hearing entitled', case=False, regex=False, na=False), master_file_data_frame['Title'].str.replace('.*(hearing entitled)', ''))
 ]
 title_requirment, title_result = zip(*title_queries)
 
 master_file_data_frame["Title"] = np.select(title_requirment, title_result, master_file_data_frame["Title"])
+master_file_data_frame['Title'] = master_file_data_frame['Title'].str.replace('Full Committee Hearing entitled','')
 
-master_file_data_frame['Title'] = master_file_data_frame['Title'].str.replace('---', '').str.strip()
-
+master_file_data_frame['Title'] = master_file_data_frame['Title'].str.replace('---', '').str.replace('"', '').str.strip()
+total_gov_info_senate_hearing["Title"] = total_gov_info_senate_hearing["Title"].str.replace('[^\w\s]','').str.strip()
+master_file_data_frame['Title'] = master_file_data_frame['Title'].str.replace('[^\w\s]','').str.strip()
 
 master_file_data_frame[["Date","Title"]].to_csv("Test.csv")
 joined_df = master_file_data_frame.merge(total_gov_info_senate_hearing, on='Title', how='left')
 joined_df = joined_df.dropna(subset=['publishdate'])
 joined_df = joined_df.drop_duplicates(subset=['URL'])
 print(joined_df)
-# joined_df.to_csv("JoinedFileTest.csv")
+joined_df.to_csv("JoinedFileTest.csv")
