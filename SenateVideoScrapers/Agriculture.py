@@ -15,6 +15,7 @@ def get_agricultural_hearings(rows: int):
     res = requests.get(url, headers=headers)
 
     soup =  BeautifulSoup(res.text,'html.parser')
+    
     table_rows = soup.findAll('tr', { 'class': 'vevent'})
     data = []
     for t in table_rows:
