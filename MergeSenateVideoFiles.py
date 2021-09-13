@@ -1,5 +1,6 @@
 import pandas as pd
 import os
+import time
 
 # This is the base case, that you want all files. Warning if you are 
 # setting it up for the first time, it may take sometime
@@ -8,6 +9,7 @@ scripts = os.listdir("./SenateVideoScrapers")
 for s in scripts:
     file_path = "./SenateVideoScrapers/" + s
     os.system(f"python3 {file_path}")
+    time.sleep(1)
 
 
 files = os.listdir("./SenateVideoFiles")
