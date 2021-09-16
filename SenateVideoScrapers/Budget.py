@@ -22,6 +22,7 @@ def get_budget_hearings(page: int):
             date = ""
         else:
             date = t.find('time', {'class': 'dtstart'}).get_text()
+            date =  datetime.strptime(date, '%m.%d.%y ').strftime("%m/%d/%Y")
         
         if t.find('a', {'class': 'summary'}) == None:
             url = ""

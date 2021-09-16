@@ -30,6 +30,7 @@ def get_JEC_hearings(year: int):
             date = ""
         else:
             date = t.find("span", {'class': "date"}).get_text().replace("\n", "")
+            date =  datetime.strptime(date, '%b %d %Y').strftime("%m/%d/%Y")
         
         row_obj ={
             "Date": date,
