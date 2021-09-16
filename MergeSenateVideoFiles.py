@@ -14,6 +14,8 @@ parser.add_argument('Command',
 args = parser.parse_args()
 
 command = args.Command
+scripts = os.listdir("./SenateVideoScrapers")
+scripts = [s.replace(".py", '') for s in scripts]
 
 if(command == 'extract-all'):
     scripts = os.listdir("./SenateVideoScrapers")
@@ -38,3 +40,8 @@ if(command == 'extract-all'):
     data_frames = data_frames[["Date","Time","URL","Title","Location","Committee","Date Scraped","video_url"]]
     print(data_frames)
     data_frames.to_csv("./SenateVideoFiles/MasterFile.csv",  encoding='utf-8', index=False)
+
+for s in scripts:
+    if(command == f'extract-all-{s}'):
+        file_path = "./SenateVideoScrapers/" + s + ".py"
+        os.system(f"python3 {file_path}")

@@ -20,4 +20,30 @@ to work with the scraper are:
 There are several ways to run the scraper. The main method to get set up is to run `MergeSenateVideoFiles.py` with the flag `extract-all` which will run all the scrapers for the committees and then merge them into
 a master CSV file.
 
-Alternativly, you can run a individual scraper contained within `SenateVideoScrapers`.
+Alternativly, you can run a individual scraper contained within `SenateVideoScrapers` via `extract-all-{COMMITTEE_NAME}` as a CLI, to run a scraper for a individual file. For example:
+
+`python3 MergeSenateVideoFiles.py extract-all-Banking`
+
+Would run the scraper for the Banking Committee.
+
+Below is a list of committeees:
+
+- Judiciary
+- Commerce
+- Finance
+- Health
+- Agriculture
+- Budget
+- Banking
+- Rules
+- Intelligence
+- Energy
+- Armed
+- Veterans
+- HomelandSecurity
+- SBC
+- Enviroment
+- JEC
+- Appropriations
+- IndianAffairs
+- Foreign
