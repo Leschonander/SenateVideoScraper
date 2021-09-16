@@ -27,6 +27,7 @@ def get_energy_hearings(page: int):
                 nums = [int(e) for e in url_for_year if e.isdigit()]
                 year = nums[0]
                 date = date + " " + str(year)
+                date =  datetime.strptime(date, '%b %d %Y').strftime("%m/%d/%Y")
         
         if t.find('span', {'class': 'element-time'}) == None:
             time = ""

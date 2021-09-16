@@ -24,9 +24,15 @@ def get_indian_affairs_hearings(page: int):
             location = ""
         else:
             location = t.find("td", {'class': "views-field-field-hearing-new-office"}).get_text().rstrip().lstrip()
+        
+        if t.find("span", {'class': "date-display-single"}) == None:
+            date = ""
+        else:
+            date = t.find("span", {'class': "date-display-single"}).get_text().replace("\n", "")
+            date =  datetime.strptime(date, '%b %d, %Y').strftime("%m/%d/%Y")
 
         row_obj = {
-            "Date": t.find("span", {'class': "date-display-single"}).get_text(),
+            "Date":date,
             "Time": t.findAll("span", {'class': "date-display-single"})[1].get_text(),
             "URL": "https://www.indian.senate.gov/" + t.findAll("a")[0]["href"],
             "Title": t.findAll("a")[0].get_text().replace("\n", "").rstrip().replace("\t", ""),
@@ -48,7 +54,7 @@ def get_indian_affairs_hearings(page: int):
                 video_url = ""
             else:
                 video_url =  video_div.find('iframe')["src"]
-        
+        print(d)
         d["video_url"] = video_url
 
     data_table = pd.DataFrame(data)
