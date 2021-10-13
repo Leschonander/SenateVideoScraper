@@ -76,7 +76,7 @@ if os.path.exists("./SenateVideoFiles/HomeLandSecurity.csv") == True:
         data_table_list.append(result)
     new_data = pd.concat(data_table_list)
 
-    old_data = pd.read_csv("./SenateVideoFiles/HomeLandSecurity.csv")
+    old_data = pd.read_csv("./SenateVideoFiles/HomeLandSecurity.csv",  lineterminator='\n')
     combined_data = pd.concat([new_data, old_data])
     combined_data = combined_data.drop_duplicates("URL")
     combined_data.to_csv("./SenateVideoFiles/HomeLandSecurity.csv",  encoding='utf-8')
