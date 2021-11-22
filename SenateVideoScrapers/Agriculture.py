@@ -57,6 +57,15 @@ def get_agricultural_hearings(rows: int):
         else:
             res_ind = requests.get(d["URL"], headers=headers)
             soup_ind = BeautifulSoup(res_ind.text,'html.parser')
+
+            if soup_ind.findAll('span', {'class': 'fn'}) == None:
+                d["witnesses"] = ""
+            else:
+                witness_html = soup_ind.findAll('span', {'class': 'fn'})
+                witness_html = [w.get_text().replace("\t", "").replace("\n", "") for w in witness_html]
+                witness_html = str(witness_html)
+                d["witnesses"] = witness_html
+
             
             if soup_ind.find('a', { 'id': 'watch-live-now'}) == None:
                 video_url = ""
@@ -69,6 +78,7 @@ def get_agricultural_hearings(rows: int):
     print(data_table)
 
     return data_table
+
 
 if os.path.exists("./SenateVideoFiles/Agricultural.csv") == True:
     new_data = get_agricultural_hearings(rows=10)
