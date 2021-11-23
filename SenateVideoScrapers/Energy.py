@@ -68,6 +68,15 @@ def get_energy_hearings(page: int):
                 video_url = ""
             else:
                 video_url =  soup_ind.find('iframe', { 'class': 'embed-responsive-item'})["src"]
+
+            if soup_ind.findAll('h4', {'class': 'full-name'}) == None:
+                d["witnesses"] = ""
+            else:
+                witness_html = soup_ind.findAll('h4', {'class': 'full-name'})
+                witness_html = [w.get_text().replace("\t", "").replace("\n", "") for w in witness_html]
+                witness_html = [i for i in witness_html if "Sen." not in i]
+                witness_html = str(witness_html)
+                d["witnesses"] = witness_html
         
             d["video_url"] = video_url
         
