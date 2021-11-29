@@ -58,6 +58,13 @@ def get_SBC_hearings(page: int):
                 video_url = ""
             else:
                 video_url =  soup_ind.find('iframe', { 'class': 'embed-responsive-item'})["src"]
+            
+            if soup_ind.findAll('div', {'class': 'person'}) == None:
+                d["witnesses"] = ""
+            else:
+                witness_html = soup_ind.findAll('div', {'class': 'person'})
+                witness_html = [w.get_text().replace("\t", "").replace("\n", "") for w in witness_html]
+                d["witnesses"] = witness_html
         
             d["video_url"] = video_url
         
