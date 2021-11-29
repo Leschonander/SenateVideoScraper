@@ -61,6 +61,15 @@ def get_armed_hearings(rows: int):
                 video_url = ""
             else:
                 video_url =  soup_ind.find('a', { 'id': 'watch-live-now'})["href"].replace("javascript:openVideoWin('", "").replace("');", "")
+            
+            if soup_ind.findAll('span', {'class': 'fn'}) == None:
+                d["witnesses"] = ""
+            else:
+                witness_html = soup_ind.findAll('span', {'class': 'fn'})
+                witness_html = [w.get_text().replace("\t", "").replace("\n", "") for w in witness_html]
+                # witness_html = [i for i in witness_html if "(" not in i]
+                witness_html = str(witness_html)
+                d["witnesses"] = witness_html
 
             d["video_url"] = video_url
         print(d)
