@@ -51,7 +51,23 @@ def get_intelligence_hearings(page: int):
             else:
                 video_url =  soup_ind.find('iframe')["src"]
             
+            # soup.findAll('div', {'class': 'field-name-field-witness-firstname'})
+            # soup.findAll('div', {'class': 'field-name-field-witness-lastname'})
+            if soup_ind.findAll('div', {'class': 'field-name-field-witness-firstname'}) == None:
+                d["witnesses"] = ""
+            else:
+
+                first_name = soup_ind.findAll('div', {'class': 'field-name-field-witness-firstname'})
+                last_name = soup_ind.findAll('div', {'class': 'field-name-field-witness-lastname'})
+                
+                first_name = [f.get_text() for f in first_name]
+                last_name = [l.get_text() for l in last_name]
+                witnesses = list(zip(first_name, last_name))
+                witnesses = [w[0] + " " + w[1] for w in witnesses]
+                d["witnesses"] = witnesses
+            
             d["video_url"] = video_url
+            print(d)
     
     data_table = pd.DataFrame(data)
 

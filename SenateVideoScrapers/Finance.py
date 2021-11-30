@@ -57,6 +57,16 @@ def get_finance_hearings(rows: int):
                 video_url =  soup_ind.find('a', { 'id': 'watch-live-now'})["href"].replace("javascript:openVideoWin('", "").replace("');", "")
             
             d["video_url"] = "https://www.finance.senate.gov"  + video_url
+
+            if soup_ind.findAll('span', {'class': 'fn'}) == None:
+                d["witnesses"] = ""
+            else:
+                witness_html = soup_ind.findAll('span', {'class': 'fn'})
+                witness_html = [w.get_text().replace("\t", "").replace("\n", "").replace("0x80", "")  for w in witness_html]
+                # witness_html = [i for i in witness_html if "(" not in i]
+                witness_html = str(witness_html)
+                d["witnesses"] = witness_html
+
         print(d)
     data_table = pd.DataFrame(data)
 

@@ -13,6 +13,7 @@ for s in scripts:
 
 
 files = os.listdir("./SenateVideoFiles")
+files = [f for f in files if f != '.DS_Store']
 data_frames = []
 for f in files:
     file_path = "./SenateVideoFiles/" + f
@@ -24,6 +25,7 @@ for f in files:
         continue
 
 data_frames = pd.concat(data_frames)
-data_frames = data_frames[["Date","Time","URL","Title","Location","Committee","Date Scraped","video_url"]]
+data_frames = data_frames[["Date","Time","URL","Title","Location","Committee","Date Scraped","video_url", "witnesses"]]
+data_frames = data_frames.rename(columns={"witnesses": "Witnesses"})
 print(data_frames)
 data_frames.to_csv("./SenateVideoFiles/MasterFile.csv",  encoding='utf-8', index=False)

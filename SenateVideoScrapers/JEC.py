@@ -1,4 +1,6 @@
+from ctypes import wintypes
 import requests
+import re
 from bs4 import BeautifulSoup
 import pandas as pd
 import os
@@ -58,6 +60,14 @@ def get_JEC_hearings(year: int):
                 video_url =  soup_ind.find('iframe')["src"]
             
             d["video_url"] = video_url
+
+            if soup_ind.find_all("a", href=re.compile("files")) == None:
+                d["witnesses"] = ""
+            else:
+                witnesses = soup_ind.find_all("a", href=re.compile("files"))
+                witnesses = [w.get_text().replace("0x80", "")  for w in witnesses]
+                d["witnesses"] = witnesses
+
         print(d)
     data_table = pd.DataFrame(data)
 
