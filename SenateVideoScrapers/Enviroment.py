@@ -69,7 +69,6 @@ def get_enviroment_hearings(page: int):
                 witness_html = soup_ind.findAll('div', {'class': 'person'})
                 witness_html = [w.get_text().replace("\t", "").replace("\n", "") for w in witness_html]
                 # witness_html = [i for i in witness_html if "(" not in i]
-                witness_html = str(witness_html)
                 d["witnesses"] = witness_html
         
         d["video_url"] = video_url

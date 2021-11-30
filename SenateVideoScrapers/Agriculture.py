@@ -63,7 +63,6 @@ def get_agricultural_hearings(rows: int):
             else:
                 witness_html = soup_ind.findAll('span', {'class': 'fn'})
                 witness_html = [w.get_text().replace("\t", "").replace("\n", "") for w in witness_html]
-                witness_html = str(witness_html)
                 d["witnesses"] = witness_html
 
             
