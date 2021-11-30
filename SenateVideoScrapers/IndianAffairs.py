@@ -60,7 +60,7 @@ def get_indian_affairs_hearings(page: int):
             else:
                 witnesses =  soup_ind.findAll('div', {'class': 'group-header'})
                 
-                witnesses = [w.get_text().replace("\n", "").replace("\xa0", "").strip() for w in witnesses]
+                witnesses = [w.get_text().replace("\n", "").replace("\xa0", "").strip().replace("0x80", "")  for w in witnesses]
                 d["witnesses"] = witnesses
 
         print(d)

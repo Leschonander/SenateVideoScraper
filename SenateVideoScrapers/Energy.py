@@ -73,7 +73,7 @@ def get_energy_hearings(page: int):
                 d["witnesses"] = ""
             else:
                 witness_html = soup_ind.findAll('h4', {'class': 'full-name'})
-                witness_html = [w.get_text().replace("\t", "").replace("\n", "") for w in witness_html]
+                witness_html = [w.get_text().replace("\t", "").replace("\n", "").replace("0x80", "")  for w in witness_html]
                 witness_html = [i for i in witness_html if "Sen." not in i]
                 witness_html = str(witness_html)
                 d["witnesses"] = witness_html

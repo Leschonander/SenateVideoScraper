@@ -65,7 +65,8 @@ def get_JEC_hearings(year: int):
                 d["witnesses"] = ""
             else:
                 witnesses = soup_ind.find_all("a", href=re.compile("files"))
-                witnesses = [w.get_text() for w in witnesses]
+                witnesses = [w.get_text().replace("0x80", "")  for w in witnesses]
+                d["witnesses"] = witnesses
 
         print(d)
     data_table = pd.DataFrame(data)
