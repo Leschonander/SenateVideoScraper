@@ -29,3 +29,4 @@ data_frames = data_frames[["Date","Time","URL","Title","Location","Committee","D
 data_frames = data_frames.rename(columns={"witnesses": "Witnesses"})
 print(data_frames)
 data_frames.to_csv("./SenateVideoFiles/MasterFile.csv",  encoding='utf-8', index=False)
+
