@@ -64,8 +64,27 @@ def get_JEC_hearings(year: int):
             if soup_ind.find_all("a", href=re.compile("files")) == None:
                 d["witnesses"] = ""
             else:
-                witnesses = soup_ind.find_all("a", href=re.compile("files"))
+                witnesses = soup_ind.find_all("a", href=re.compile("files."))
                 witnesses = [w.get_text().replace("0x80", "")  for w in witnesses]
+                witnesses = [
+                    w.replace("Hon.", "")
+                     .replace("Mr.", "")
+                     .replace("Ms.", "")
+                     .replace("Mrs.", "")
+                     .replace("Dr.", "")
+                     .replace("Ph.D.", "")
+                     .replace("PhD", "")
+                     .replace("Senator", "")
+                     .replace("Representative", "")
+                     .replace("Lt", "")
+                     .replace("The Honorable", "")
+                     .replace("Ranking Member", "")
+                     .replace("Chair", "")
+                     .replace("Chairman", "")
+                     .replace("Archived Webcast", "")
+                     .strip() 
+                    for w in witnesses
+                ]
                 d["witnesses"] = witnesses
 
         print(d)

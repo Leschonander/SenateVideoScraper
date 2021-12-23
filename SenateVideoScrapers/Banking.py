@@ -69,7 +69,24 @@ def get_banking_hearings(rows: int):
             else:
                 witness_html = soup_ind.findAll('span', {'class': 'fn'})
                 witness_html = [w.get_text().replace("\t", "").replace("\n", "").replace("0x80", "")  for w in witness_html]
-                # witness_html = [i for i in witness_html if "(" not in i]
+                witness_html = [
+                    w.replace("Hon.", "")
+                     .replace("Mr.", "")
+                     .replace("Ms.", "")
+                     .replace("Mrs.", "")
+                     .replace("Dr.", "")
+                     .replace("Ph.D.", "")
+                     .replace("PhD", "")
+                     .replace("Senator", "")
+                     .replace("Representative", "")
+                     .replace("Lt", "")
+                     .replace("The Honorable", "")
+                     .replace("Ranking Member", "")
+                     .replace("Chair", "")
+                     .replace("Chairman", "")
+                     .strip() 
+                    for w in witness_html
+                ]
                 d["witnesses"] = witness_html
 
             d["video_url"] = video_url

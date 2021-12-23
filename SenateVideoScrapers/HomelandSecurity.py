@@ -67,7 +67,22 @@ def get_homeland_security_hearings(page: int):
                 witness_html = soup_ind.findAll('span', {'class': 'fn'})
                 witness_html = [w.get_text().replace("\t", "").replace("\n", "").replace("0x80", "")  for w in witness_html]
                 witness_html = [i for i in witness_html if "(" not in i]
-                witness_html = str(witness_html)
+                witness_html = [
+                    w.replace("Hon.", "")
+                     .replace("Mr.", "")
+                     .replace("Ms.", "")
+                     .replace("Mrs.", "")
+                     .replace("Dr.", "")
+                     .replace("Ph.D.", "")
+                     .replace("PhD", "")
+                     .replace("Senator", "")
+                     .replace("Representative", "")
+                     .replace("Lt", "")
+                     .replace("The Honorable", "")
+                     .strip() 
+                    for w in witness_html
+                ]
+                witness_html = list(set(witness_html))
                 d["witnesses"] = witness_html
 
         d["video_url"] = video_url
