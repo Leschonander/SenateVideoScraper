@@ -99,5 +99,5 @@ if os.path.exists("./SenateVideoFiles/Approporiations.csv") == True:
     combined_data = combined_data.drop_duplicates("URL")
     combined_data.to_csv("./SenateVideoFiles/Approporiations.csv",  encoding='utf-8')
 else: 
-    get_appropriations_hearings(rows=4000).to_csv("./SenateVideoFiles/Approporiations.csv",  encoding='utf-8')
+    get_appropriations_hearings(rows=5000).to_csv("./SenateVideoFiles/Approporiations.csv",  encoding='utf-8')
 

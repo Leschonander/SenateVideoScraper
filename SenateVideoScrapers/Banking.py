@@ -103,4 +103,4 @@ if os.path.exists("./SenateVideoFiles/Banking.csv") == True:
     combined_data = combined_data.drop_duplicates("URL")
     combined_data.to_csv("./SenateVideoFiles/Banking.csv",  encoding='utf-8')
 else: 
-    get_banking_hearings(rows = 2000).to_csv("./SenateVideoFiles/Banking.csv",  encoding='utf-8')
+    get_banking_hearings(rows = 5000).to_csv("./SenateVideoFiles/Banking.csv",  encoding='utf-8')

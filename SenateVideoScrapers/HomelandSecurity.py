@@ -107,7 +107,7 @@ if os.path.exists("./SenateVideoFiles/HomeLandSecurity.csv") == True:
     combined_data.to_csv("./SenateVideoFiles/HomeLandSecurity.csv",  encoding='utf-8')
 
 else: 
-    pages = [i for i in range(1, 95)]
+    pages = [i for i in range(1, 96)]
     data_table_list = []
     for p in pages:
         result = get_homeland_security_hearings(p)
