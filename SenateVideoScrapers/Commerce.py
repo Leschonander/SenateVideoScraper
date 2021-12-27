@@ -65,6 +65,7 @@ def get_commerce_hearings(year: int):
                 witness_html = [
                     w.replace("Hon.", "")
                      .replace("Mr.", "")
+                     .replace("Mr", "")
                      .replace("Ms.", "")
                      .replace("Mrs.", "")
                      .replace("Dr.", "")
@@ -75,10 +76,12 @@ def get_commerce_hearings(year: int):
                      .replace("Lt", "")
                      .replace("The Honorable", "")
                      .replace("Ranking Member", "")
+                     .replace("Chairman", "")
                      .replace("Chair", "")
                      .strip() 
                     for w in witness_html
                 ]
+                witness_html = list(set(witness_html))
                 d["witnesses"] = witness_html
         
         d["video_url"] = video_url
