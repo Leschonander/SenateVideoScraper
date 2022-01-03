@@ -56,11 +56,29 @@ def get_indian_affairs_hearings(page: int):
                 video_url =  video_div.find('iframe')["src"]
 
             if soup_ind.findAll('div', {'class': 'group-header'}) == None:
-                d["witnesses"] = ""
+                d["witnesses"] = []
             else:
                 witnesses =  soup_ind.findAll('div', {'class': 'group-header'})
                 
                 witnesses = [w.get_text().replace("\n", "").replace("\xa0", "").strip().replace("0x80", "")  for w in witnesses]
+                witnesses = [
+                    w.replace("Hon.", "")
+                     .replace("Mr.", "")
+                     .replace("Ms.", "")
+                     .replace("Mrs.", "")
+                     .replace("Dr.", "")
+                     .replace("Ph.D.", "")
+                     .replace("PhD", "")
+                     .replace("Senator", "")
+                     .replace("Representative", "")
+                     .replace("Lt", "")
+                     .replace("The Honorable", "")
+                     .replace("Ranking Member", "")
+                     .replace("Chair", "")
+                     .replace("Chairman", "")
+                     .strip() 
+                    for w in witnesses
+                ]
                 d["witnesses"] = witnesses
 
         print(d)

@@ -62,7 +62,26 @@ def get_commerce_hearings(year: int):
             else:
                 witness_html = soup_ind.findAll('h4', {'class': 'full-name'})
                 witness_html = [w.get_text().replace("\t", "").replace("\n", "").replace("0x80", "")  for w in witness_html]
-                witness_html = str(witness_html)
+                witness_html = [
+                    w.replace("Hon.", "")
+                     .replace("Mr.", "")
+                     .replace("Mr", "")
+                     .replace("Ms.", "")
+                     .replace("Mrs.", "")
+                     .replace("Dr.", "")
+                     .replace("Ph.D.", "")
+                     .replace("PhD", "")
+                     .replace("Senator", "")
+                     .replace("Representative", "")
+                     .replace("Lt", "")
+                     .replace("The Honorable", "")
+                     .replace("Ranking Member", "")
+                     .replace("Chairman", "")
+                     .replace("Chair", "")
+                     .strip() 
+                    for w in witness_html
+                ]
+                witness_html = list(set(witness_html))
                 d["witnesses"] = witness_html
         
         d["video_url"] = video_url

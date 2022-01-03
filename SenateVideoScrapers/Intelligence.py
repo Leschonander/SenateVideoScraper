@@ -62,9 +62,26 @@ def get_intelligence_hearings(page: int):
                 
                 first_name = [f.get_text() for f in first_name]
                 last_name = [l.get_text() for l in last_name]
-                witnesses = list(zip(first_name, last_name))
-                witnesses = [w[0] + " " + w[1] for w in witnesses]
-                d["witnesses"] = witnesses
+                witness_html = list(zip(first_name, last_name))
+                witness_html = [w[0] + " " + w[1] for w in witness_html]
+                witness_html = [
+                    w.replace("Hon.", "")
+                     .replace("Mr.", "")
+                     .replace("Ms.", "")
+                     .replace("Mrs.", "")
+                     .replace("Dr.", "")
+                     .replace("Ph.D.", "")
+                     .replace("PhD", "")
+                     .replace("Senator", "")
+                     .replace("Representative", "")
+                     .replace("Lt", "")
+                     .replace("The Honorable", "")
+                     .replace("Ranking Member", "")
+                     .replace("Chair", "")
+                     .strip() 
+                    for w in witness_html
+                ]
+                d["witnesses"] = witness_html
             
             d["video_url"] = video_url
             print(d)
