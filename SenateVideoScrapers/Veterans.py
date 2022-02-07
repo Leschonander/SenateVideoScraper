@@ -66,7 +66,7 @@ def get_veterans_hearings(rows: int):
                 d["witnesses"] = ""
             else:
                 witness_html = soup_ind.findAll('span', {'class': 'fn'})
-                witness_html = [w.get_text().replace("\t", "").replace("\n", "").replace("0x80", "") for w in witness_html]
+                witness_html = [w.get_text().replace("\t", "").replace("\n", " ").replace("0x80", "") for w in witness_html]
                 # witness_html = [i for i in witness_html if "(" not in i]
                 witness_html = [
                     w.replace("Hon.", "")
@@ -76,16 +76,36 @@ def get_veterans_hearings(rows: int):
                      .replace("Dr.", "")
                      .replace("Ph.D.", "")
                      .replace("PhD", "")
+                     .replace("Ph.D", "")
+                     .replace("MD", "")
+                     .replace("M.D.", "")
+                     .replace("MPH", "")
+                     .replace("MSW", "")
+                     .replace("Esq", "")
+                     .replace("Esq.", "")
+                     .replace("JD", "")
                      .replace("Senator", "")
                      .replace("Representative", "")
                      .replace("Lt", "")
                      .replace("The Honorable", "")
+                     .replace("Honorable", "")
                      .replace("Ranking Member", "")
-                     .replace("Chair", "")
                      .replace("Chairman", "")
+                     .replace("Chair", "")
+                     .replace("USN", "")
+                     .replace("USA", "")
+                     .replace("USMC", "")
+                     .replace("USN", "")
+                     .replace("USCG", "")
+                     .replace("USAF", "")
+                     .replace("MACP", "")
+                     .replace("(Ret)", "")
+                     .replace(",", "")
                      .strip() 
                     for w in witness_html
                 ]
+                witness_html = [' '.join(w.split()) for w in witness_html]
+                witness_html = list(set(witness_html))
                 d["witnesses"] = witness_html
                 
             d["video_url"] = video_url
