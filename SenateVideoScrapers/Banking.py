@@ -15,7 +15,7 @@ def get_banking_hearings(rows: int):
     res = requests.get(url, headers=headers)
 
     soup =  BeautifulSoup(res.text,'html.parser')
-
+    
     table_rows = soup.findAll('tr', { 'class': 'vevent'})
     data = []
     for t in table_rows:
@@ -68,7 +68,7 @@ def get_banking_hearings(rows: int):
                 d["witnesses"] = ""
             else:
                 witness_html = soup_ind.findAll('span', {'class': 'fn'})
-                witness_html = [w.get_text().replace("\t", "").replace("\n", "").replace("0x80", "")  for w in witness_html]
+                witness_html = [w.get_text().replace("\t", "").replace("\n", " ").replace("0x80", "")  for w in witness_html]
                 witness_html = [
                     w.replace("Hon.", "")
                      .replace("Mr.", "")
@@ -82,11 +82,12 @@ def get_banking_hearings(rows: int):
                      .replace("Lt", "")
                      .replace("The Honorable", "")
                      .replace("Ranking Member", "")
-                     .replace("Chair", "")
                      .replace("Chairman", "")
+                     .replace("Chair", "")
                      .strip() 
                     for w in witness_html
                 ]
+                witness_html = [' '.join(w.split()) for w in witness_html]
                 d["witnesses"] = witness_html
 
             d["video_url"] = video_url

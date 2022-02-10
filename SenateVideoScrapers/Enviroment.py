@@ -86,6 +86,7 @@ def get_enviroment_hearings(page: int):
                      .strip() 
                     for w in witness_html
                 ]
+                witness_html = [' '.join(w.split()) for w in witness_html]
                 d["witnesses"] = witness_html
         
         d["video_url"] = video_url

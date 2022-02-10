@@ -77,7 +77,7 @@ def get_foreign_hearings(rows: int):
                 d["witnesses"] = ""
             else:
                 witness_html = soup_ind.findAll('span', {'class': 'fn'})
-                witness_html = [w.get_text().replace("\t", "").replace("\n", "").replace("0x80", "")  for w in witness_html]
+                witness_html = [w.get_text().replace("\t", "").replace("\n", " ").replace("0x80", "")  for w in witness_html]
                 # witness_html = [i for i in witness_html if "(" not in i]
                 witness_html = [
                     w.replace("Hon.", "")
@@ -97,6 +97,8 @@ def get_foreign_hearings(rows: int):
                      .strip() 
                     for w in witness_html
                 ]
+                witness_html = [' '.join(w.split()) for w in witness_html]
+                witness_html = list(set(witness_html))
                 d["witnesses"] = witness_html
 
         print(d)

@@ -66,7 +66,7 @@ def get_armed_hearings(rows: int):
                 d["witnesses"] = ""
             else:
                 witness_html = soup_ind.findAll('span', {'class': 'fn'})
-                witness_html = [w.get_text().replace("\t", "").replace("\n", "").replace("0x80", "")  for w in witness_html]
+                witness_html = [w.get_text().replace("\t", "").replace("\n", " ").replace("0x80", "")  for w in witness_html]
                 witness_html = [
                     w.replace("Hon.", "")
                      .replace("Mr.", "")
@@ -82,9 +82,18 @@ def get_armed_hearings(rows: int):
                      .replace("Ranking Member", "")
                      .replace("Chair", "")
                      .replace("Chairman", "")
+                     .replace(", USN", "")
+                     .replace(", USA", "")
+                     .replace(", USMC", "")
+                     .replace(", USN", "")
+                     .replace(", USCG", "")
+                     .replace(", USAF", "")
+                     .replace("**", "")
                      .strip() 
                     for w in witness_html
                 ]
+                witness_html = [' '.join(w.split()) for w in witness_html]
+                witness_html = list(set(witness_html))
                 d["witnesses"] = witness_html
 
             d["video_url"] = video_url

@@ -63,7 +63,7 @@ def get_SBC_hearings(page: int):
                 d["witnesses"] = ""
             else:
                 witness_html = soup_ind.findAll('div', {'class': 'person'})
-                witness_html = [w.get_text().replace("\t", "").replace("\n", "").replace("0x80", "") for w in witness_html]
+                witness_html = [w.get_text().replace("\t", "").replace("\n", " ").replace("0x80", "") for w in witness_html]
                 witness_html = [
                     w.replace("Hon.", "")
                      .replace("Mr.", "")
@@ -76,12 +76,16 @@ def get_SBC_hearings(page: int):
                      .replace("Representative", "")
                      .replace("Lt", "")
                      .replace("The Honorable", "")
+                     .replace("Honorable", "")
                      .replace("Ranking Member", "")
-                     .replace("Chair", "")
                      .replace("Chairman", "")
+                     .replace("Chair", "")
                      .strip() 
                     for w in witness_html
                 ]
+
+                witness_html = [' '.join(w.split()) for w in witness_html]
+                witness_html = list(set(witness_html))
                 d["witnesses"] = witness_html
         
             d["video_url"] = video_url
