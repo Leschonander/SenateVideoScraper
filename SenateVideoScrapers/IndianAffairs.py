@@ -81,6 +81,12 @@ def get_indian_affairs_hearings(page: int):
                 ]
                 d["witnesses"] = witnesses
 
+                transcripts = []
+                for a in soup_ind.find_all('a', href=True): 
+                    if "Testimony" in a.text:
+                        transcripts.append("https://www.indian.senate.gov" + a['href'])
+                d["transcripts"] = transcripts
+
         print(d)
         d["video_url"] = video_url
 

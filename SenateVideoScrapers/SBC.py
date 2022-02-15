@@ -87,7 +87,13 @@ def get_SBC_hearings(page: int):
                 witness_html = [' '.join(w.split()) for w in witness_html]
                 witness_html = list(set(witness_html))
                 d["witnesses"] = witness_html
-        
+
+                transcripts = []
+                for a in soup_ind.find_all('a', href=True): 
+                    if "Testimony" in a.text:
+                        transcripts.append("https://www.sbc.senate.gov" + a['href'])
+                d["transcripts"] = transcripts
+
             d["video_url"] = video_url
         
         print(d)

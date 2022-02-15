@@ -94,6 +94,10 @@ def get_energy_hearings(page: int):
                     for w in witness_html
                 ]
                 d["witnesses"] = witness_html
+
+                transcripts = soup_ind.findAll('a', {'class': 'file-btn'})
+                transcripts = [t["href"]  for t in transcripts]
+                d["transcripts"] = transcripts
         
             d["video_url"] = video_url
         

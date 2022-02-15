@@ -3,6 +3,7 @@ from bs4 import BeautifulSoup
 import pandas as pd
 import os
 from datetime import datetime
+import re
 
 def get_judiciary_hearings(rows: int):
 
@@ -97,6 +98,23 @@ def get_judiciary_hearings(rows: int):
                 witness_html = list(set(witness_html))
 
                 d["witnesses"] = witness_html
+
+                transcripts = soup_ind.find_all("a", href=re.compile("testimony"))
+                transcripts = [t["href"] for t in transcripts]
+                transcript_links = []
+                for t in transcripts:
+                    res_tran = requests.get(t, headers=headers)
+                    soup_tran = BeautifulSoup(res_tran.text,'html.parser')
+                    transcript_pdf = soup_tran.find("a", href=re.compile("download"))
+                    transcript_pdf = "http:" + transcript_pdf["href"]
+                    try:
+                        pdf_page = requests.get(transcript_pdf, headers=headers)
+                        transcript_links.append(pdf_page.url)
+                    except:
+                        raise
+                    
+                
+                d["transcripts"] = transcript_links
             
         d["video_url"] = video_url
         print(d)
