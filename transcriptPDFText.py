@@ -35,8 +35,9 @@ for i, row in enumerate(df.itertuples(index=False)):
                 #print(text)
                 all_text += '\n' + text
             data = {
+                "name": row[4],
                 "url": row[10],
-                "Text": all_text
+                "text": all_text
             }
             print(data)
             transcript_data.append(data)
