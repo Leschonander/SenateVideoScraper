@@ -25,8 +25,8 @@ for f in files:
         continue
 
 data_frames = pd.concat(data_frames)
-data_frames = data_frames[["Date","Time","URL","Title","Location","Committee","Date Scraped","video_url", "witnesses"]]
-data_frames = data_frames.rename(columns={"witnesses": "Witnesses"})
+data_frames = data_frames[["Date","Time","URL","Title","Location","Committee","Date Scraped","video_url", "witnesses", "transcripts"]]
+data_frames = data_frames.rename(columns={"witnesses": "Witnesses", "transcripts": "Transcripts"})
 print(data_frames)
 data_frames.to_csv("./SenateVideoFiles/MasterFile.csv",  encoding='utf-8', index=False)
 
