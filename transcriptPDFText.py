@@ -20,10 +20,10 @@ df["Transcripts"] = df["Transcripts"].str.replace("'", '')
 df = df.query('`Transcripts` != ""') # dropping blank entries...
 
 df = df.loc[~df['Transcripts'].str.contains("https://www.indian.senate.govhttp", case=False,  na=False)]
-df = df.iloc[10001:20000]
+df = df.iloc[24193:]
 
 t_length = len(df) 
-
+# print(t_length)
 seen_transcripts = {}
 transcript_data = []
 # Need a better way to read this to ensure faster reads later on...
@@ -70,5 +70,5 @@ transcript_data = transcript_data[['name', 'url', 'text']]
 
 print(transcript_data)
 
-transcript_data.to_csv("transcript_text_part2.csv")
+transcript_data.to_csv("transcript_text_part3_2.csv")
 
