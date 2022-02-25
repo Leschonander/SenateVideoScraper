@@ -19,12 +19,14 @@ df = df.explode('Transcripts') # Transcripts
 df["Transcripts"] = df["Transcripts"].str.replace("'", '')
 df = df.query('`Transcripts` != ""') # dropping blank entries...
 
+df = df.loc[~df['Transcripts'].str.contains("https://www.indian.senate.govhttp", case=False,  na=False)]
+df = df.iloc[10001:20000]
+
 t_length = len(df) 
 
 seen_transcripts = {}
 transcript_data = []
 # Need a better way to read this to ensure faster reads later on...
-df = df.iloc[20804:]
 
 faulty_pdfs = ["https://www.indian.senate.govhttps://www.indian.senate.gov/sites/default/files/SCIA%20Testimony%20Re%20S.%201364%20HR%201975%20HR%202088%20and%20HR%204881%20%28CLEARED%29%20newland.pdf"]
 # ^ Bit crude but the Senate is a mess...
@@ -34,6 +36,7 @@ for i, row in enumerate(df.itertuples(index=False)):
     if isinstance(row[9], str) == True:
       if row[9] not in seen_transcripts and ".pdf" in row[9] and isinstance(row[9], str) == True and row[9] not in faulty_pdfs:
           seen_transcripts[row[9]] = 1
+
           if urlparse(row[9]).scheme != "":
               if "https://www.indian.senate.govhttps" in row[9]:
                 pdf_url = re.get(row[9].replace("https://www.indian.senate.govhttps", "https"))
@@ -67,5 +70,5 @@ transcript_data = transcript_data[['name', 'url', 'text']]
 
 print(transcript_data)
 
-transcript_data.to_csv("transcript_text.csv")
+transcript_data.to_csv("transcript_text_part2.csv")
 
