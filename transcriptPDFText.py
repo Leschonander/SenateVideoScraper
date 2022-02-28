@@ -20,7 +20,7 @@ df["Transcripts"] = df["Transcripts"].str.replace("'", '')
 df = df.query('`Transcripts` != ""') # dropping blank entries...
 
 df = df.loc[~df['Transcripts'].str.contains("https://www.indian.senate.govhttp", case=False,  na=False)]
-df = df.iloc[24193:]
+df = df.iloc[0:]
 
 t_length = len(df) 
 # print(t_length)
