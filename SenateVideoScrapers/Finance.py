@@ -3,7 +3,7 @@ from bs4 import BeautifulSoup
 import pandas as pd
 import os
 from datetime import datetime
-
+import re
 
 def get_finance_hearings(rows: int):
 
@@ -85,6 +85,23 @@ def get_finance_hearings(rows: int):
                 ]
                 witness_html = [' '.join(w.split()) for w in witness_html]
                 d["witnesses"] = witness_html
+
+                transcript_links = []
+                for a in soup_ind.find_all('a', href=True): 
+                    if "Testimony" in a.text:
+                        if 'https:' in a["href"]:
+                            res_tran = requests.get(a['href'], headers=headers)
+                        
+                            soup_tran = BeautifulSoup(res_tran.text,'html.parser')
+                            transcript_pdf = soup_tran.find("a", href=re.compile("download"))
+                            if transcript_pdf != None:
+                                try:
+                                    pdf_page = requests.get(transcript_pdf["href"], headers=headers)
+                                    transcript_links.append(pdf_page.url)
+                                except:
+                                    continue
+                
+                d["transcripts"] = transcript_links
 
         print(d)
     data_table = pd.DataFrame(data)

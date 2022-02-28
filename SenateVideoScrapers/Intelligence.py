@@ -82,6 +82,13 @@ def get_intelligence_hearings(page: int):
                     for w in witness_html
                 ]
                 d["witnesses"] = witness_html
+
+                transcripts = []
+                for a in soup_ind.find_all('a', href=True): 
+                    if "Opening Statement" in a.text or "Response" in a.text:
+                        res_tran = requests.get("https://www.intelligence.senate.gov" + a['href'], headers=headers)
+                        transcripts.append(res_tran.url)
+                d["transcripts"] = transcripts
             
             d["video_url"] = video_url
             print(d)

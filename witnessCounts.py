@@ -1,7 +1,4 @@
 import pandas as pd
-import os
-import time
-import ast
 
 
 df = pd.read_csv("./SenateVideoFiles/MasterFile.csv")

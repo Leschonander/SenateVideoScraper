@@ -88,6 +88,13 @@ def get_homeland_security_hearings(page: int):
                 witness_html = list(set(witness_html))
                 d["witnesses"] = witness_html
 
+                transcripts = []
+                for a in soup_ind.find_all('a', href=True): 
+                    if "Download Testimony" in a.text:
+                        res_tran = requests.get(a['href'], headers=headers)
+                        transcripts.append(res_tran.url)
+                d["transcripts"] = transcripts
+
         d["video_url"] = video_url
         print(d)
 
