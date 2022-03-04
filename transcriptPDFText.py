@@ -4,9 +4,17 @@ import requests as re
 from io import BytesIO
 from urllib.parse import urlparse
 
+def url_validator(x: str):
+    try:
+        result = urlparse(x)
+        return all([result.scheme, result.netloc])
+    except:
+        return False
+
+# url_validator Lots of false urls...
 
 df = pd.read_csv("./SenateVideoFiles/MasterFile.csv") 
-
+current_transcripts = pd.read_csv("New_T_File.csv")
 # Explode Transcripts
 
 
@@ -18,7 +26,47 @@ df = df.explode('Transcripts') # Transcripts
 
 df["Transcripts"] = df["Transcripts"].str.replace("'", '')
 df = df.query('`Transcripts` != ""') # dropping blank entries...
+current_transcripts_list = list(current_transcripts["url"])
 
+not_processed = ~df.Transcripts.isin(current_transcripts_list)
+df = df[not_processed]
+t_length = len(df) 
+
+seen_transcripts = {}
+transcript_data = []
+df = df.iloc[0:100]
+
+for i, row in enumerate(df.itertuples(index=False)):
+    print(f"{i} / {t_length} => {i / t_length}")
+    if isinstance(row[9], str) == True:
+      if row[9] not in seen_transcripts and ".pdf" in row[9] and isinstance(row[9], str) == True:
+        if ('https:' or 'http:' in row[9]) and "/" in row[9]:
+          pdf_url = re.get(row[9])
+          if pdf_url.status_code == 200:
+                  try:
+                      if pdf_url.content == b'':
+                        print("Faulty PDF")
+                      else:
+                        pdf = pdfplumber.open(BytesIO(pdf_url.content))
+                        all_text = ""
+  
+                        for page in pdf.pages:
+                            text = page.extract_text()
+                            #print(text)
+                            all_text += '\n' + text
+                        data = {
+                          "name": row[4],
+                          "url": row[9],
+                          "text": all_text
+                        }
+                        print(data)
+                        transcript_data.append(data)
+                  except:
+                      raise
+        
+transcript_data_new = pd.DataFrame(transcript_data)
+print(transcript_data_new)
+'''
 df = df.loc[~df['Transcripts'].str.contains("https://www.indian.senate.govhttp", case=False,  na=False)]
 df = df.iloc[0:]
 
@@ -71,4 +119,4 @@ transcript_data = transcript_data[['name', 'url', 'text']]
 print(transcript_data)
 
 transcript_data.to_csv("transcript_text_part3_2.csv")
-
+'''
