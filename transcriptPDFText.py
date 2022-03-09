@@ -32,12 +32,12 @@ t_length = len(df)
 
 seen_transcripts = {}
 transcript_data = []
-df = df.iloc[12000:13800] 
+df = df.iloc[4000:4019] 
 
 for i, row in enumerate(df.itertuples(index=False)):
     print(f"{i} / {t_length} => {i / t_length} | {row[9]}")
     if isinstance(row[9], str) == True:
-      if row[9] not in seen_transcripts and ".pdf" in row[9] and isinstance(row[9], str) == True:
+      if ((row[9] not in seen_transcripts and ".pdf" in row[9]) or (row[9] not in seen_transcripts and "https://www.commerce.senate.gov/services/files/" in row[9])) and isinstance(row[9], str) == True:
         seen_transcripts[row[9]] = 1
         if ('https:' or 'http:' in row[9]) and "/" in row[9]:
           pdf_url = re.get(row[9], headers=headers)

@@ -4,3 +4,4 @@ env
 .DS_STORE
 cleanMasterFile.py
 MasterVideoToJson.py
+*.ini
