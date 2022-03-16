@@ -59,48 +59,46 @@ def get_agricultural_hearings(rows: int):
             res_ind = requests.get(d["URL"], headers=headers)
             soup_ind = BeautifulSoup(res_ind.text,'html.parser')
 
-            if soup_ind.findAll('span', {'class': 'fn'}) == None:
+            if soup_ind.findAll('li', {'class': 'vcard'}) == None:
                 d["witnesses"] = ""
-            else:
-                witness_html = soup_ind.findAll('span', {'class': 'fn'})
-                witness_html = [w.get_text().replace("\t", "").replace("\n", " ").replace("0x80", "").strip()  for w in witness_html]
-                witness_html = [
-                    w.replace("Hon.", "")
-                     .replace("Mr.", "")
-                     .replace("Ms.", "")
-                     .replace("Mrs.", "")
-                     .replace("Dr.", "")
-                     .replace("Ph.D.", "")
-                     .replace("PhD", "")
-                     .replace("Senator", "")
-                     .replace("Representative", "")
-                     .replace("Lt", "")
-                     .replace("The Honorable", "")
-                     .replace("(R-GA)", "")
-                     .strip() 
-                    for w in witness_html
-                ]
-                witness_html = [' '.join(w.split()) for w in witness_html]
-                witness_html = list(set(witness_html))
+                d["transcripts"] = ""
+                d["witness_transcripts"] = ""
 
-                d["witnesses"] = witness_html
-                transcript_links = []
-                for a in soup_ind.find_all('a', href=True): 
-                    if "Testimony" in a.text:
-                        
-                        if 'http:' in a["href"]:
-                            res_tran = requests.get(a['href'], headers=headers)
-                        
+            else:
+
+                witness_cards = soup_ind.findAll("li", {"class": "vcard"})
+                witness = []
+                transcripts = []
+                witness_transcripts = []
+
+                for w in witness_cards:
+                    witness_name = w.find('span',  {'class': 'fn'}).get_text().replace("\t", "").replace("\n", " ").replace("0x80", "").strip()
+                    witness_name = witness_name.replace("Hon.", "").replace("Mr.", "").replace("Ms.", "").replace("Mrs.", "").replace("Dr.", "").replace("Ph.D.", "").replace("PhD", "").replace("Senator", "").replace("Representative", "").replace("Lt", "").replace("The Honorable", "").replace("(R-GA)", "").strip() 
+                    witness_name = ' '.join(witness_name.split())
+
+                    if w.find('a',  {'class': 'hearing-pdf'}) == None:
+                        witness_url = ''
+                    else:
+                        testimony = w.find('a',  {'class': 'hearing-pdf'})
+                        if 'https:' in testimony["href"] or 'http:' in testimony["href"]:
+                            res_tran = requests.get(testimony['href'], headers=headers)
                             soup_tran = BeautifulSoup(res_tran.text,'html.parser')
                             transcript_pdf = soup_tran.find("a", href=re.compile("download"))
                             if transcript_pdf != None:
                                 pdf_page = requests.get(transcript_pdf["href"], headers=headers)
-                                transcript_links.append(pdf_page.url)
-                
-                d["transcripts"] = transcript_links
+                                witness_url = pdf_page.url
+                            else:
+                                witness_url = ''
+                    
+                    witness.append(witness_name)
+                    transcripts.append(witness_url)
+                    witness_transcripts.append((witness_name,witness_url))
 
-                
-            
+                d["witnesses"] = witness
+                d["transcripts"] = transcripts
+                d["witness_transcripts"] = witness_transcripts
+
+               
             if soup_ind.find('a', { 'id': 'watch-live-now'}) == None:
                 video_url = ""
             else:
