@@ -59,6 +59,53 @@ def get_SBC_hearings(page: int):
             else:
                 video_url =  soup_ind.find('iframe', { 'class': 'embed-responsive-item'})["src"]
             
+            if soup_ind.findAll('li', {'class': 'list-group-item'}) == None:
+                d["witnesses"] = ""
+                d["transcripts"] = ""
+                d["witness_transcripts"] = ""
+            else:
+                witness_cards = soup_ind.findAll('li', {'class': 'list-group-item'})
+                witness = []
+                transcripts = []
+                witness_transcripts = []
+
+                for w in witness_cards:
+
+                    if w.find('div',  {'class': 'person'}) == None:
+                        witness_name = ''
+                    else: 
+                        witness_name = w.find('div',  {'class': 'person'}).get_text().replace("\t", "").replace("\n", " ").replace("0x80", "").strip()
+                        witness_name = witness_name.replace("Hon.", "").replace("Mr.", "").replace("Ms.", "").replace("Mrs.", "").replace("Dr.", "").replace("Ph.D.", "").replace("PhD", "").replace("Senator", "").replace("Representative", "").replace("Lt", "").replace("The Honorable", "").replace("(R-GA)", "").strip() 
+                        witness_name = ' '.join(witness_name.split())
+                    
+                    if w.find('a') == None:
+                        witness_url = ''
+                    else:
+                        testimony = w.find('a')
+                        link_to_pdf = "https://www.sbc.senate.gov" + testimony["href"] 
+                        res_tran = requests.get(link_to_pdf, headers=headers)
+                        soup_tran = BeautifulSoup(res_tran.text,'html.parser')
+                        file_link = soup_tran.find("span", {"class": "file_link"})
+                        
+                        if file_link == None or file_link.find("a") == None:
+                            witness_url = ''
+                        else:
+                            file_link =  file_link.find("a")
+                            if file_link != None:
+                                pdf_page = requests.get("https://www.sbc.senate.gov" + file_link["href"], headers=headers)
+                                witness_url = pdf_page.url
+                            else:
+                                witness_url = ''
+                    
+                    witness.append(witness_name)
+                    transcripts.append(witness_url)
+                    witness_transcripts.append((witness_name,witness_url))
+
+                d["witnesses"] = witness
+                d["transcripts"] = transcripts
+                d["witness_transcripts"] = witness_transcripts
+
+            '''
             if soup_ind.findAll('div', {'class': 'person'}) == None:
                 d["witnesses"] = ""
             else:
@@ -93,7 +140,7 @@ def get_SBC_hearings(page: int):
                     if "Testimony" in a.text:
                         transcripts.append("https://www.sbc.senate.gov" + a['href'])
                 d["transcripts"] = transcripts
-
+            '''
             d["video_url"] = video_url
         
         print(d)
