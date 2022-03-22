@@ -80,7 +80,6 @@ def get_commerce_hearings(year: int):
                                 res_tran = requests.get("https://www.commerce.senate.gov" + testimony, headers=headers)
                                 witness_url = res_tran.url
                             else:
-                                print(testimony)
                                 res_tran = requests.get(testimony, headers=headers)
                                 witness_url = res_tran.url
                         else:

@@ -3,7 +3,7 @@ from bs4 import BeautifulSoup
 import pandas as pd
 import os
 from datetime import datetime
-
+import re
 
 def get_intelligence_hearings(page: int):
 
@@ -51,8 +51,33 @@ def get_intelligence_hearings(page: int):
             else:
                 video_url =  soup_ind.find('iframe')["src"]
             
-            # soup.findAll('div', {'class': 'field-name-field-witness-firstname'})
-            # soup.findAll('div', {'class': 'field-name-field-witness-lastname'})
+            if soup_ind.findAll('div', {'class': 'entity'}) == None:
+                d["witnesses"] = ""
+            else:
+                witness_cards = soup_ind.findAll("div", {"class": "entity"})
+                witness = []
+                transcripts = []
+                witness_transcripts = []
+
+                for w in witness_cards:
+                    first_name = w.find('div', {'class': 'field-name-field-witness-firstname'}).get_text()
+                    last_name = w.find('div', {'class': 'field-name-field-witness-lastname'}).get_text()
+                    
+                    witness_name = first_name + last_name
+                    witness_name = witness_name.replace("Hon.", "").replace("Mr.", "").replace("Ms.", "").replace("Mrs.", "").replace("Dr.", "").replace("Ph.D.", "").replace("PhD", "").replace("Senator", "").replace("Representative", "").replace("Lt", "").replace("The Honorable", "").replace("(R-GA)", "").strip() 
+                    witness_name = ' '.join(witness_name.split())
+
+                    if w.find("a", string=re.compile(r'Opening Statement|Response')) == None:
+                        witness_url = ''
+                    else:
+                        witness_url = w.find("a", string=re.compile(r'Opening Statement|Response'))
+                        witness_url = "https://www.intelligence.senate.gov" + witness_url
+                    
+                    witness.append(witness_name)
+                    transcripts.append(witness_url)
+                    witness_transcripts.append((witness_name,witness_url))
+
+            '''
             if soup_ind.findAll('div', {'class': 'field-name-field-witness-firstname'}) == None:
                 d["witnesses"] = ""
             else:
@@ -89,7 +114,7 @@ def get_intelligence_hearings(page: int):
                         res_tran = requests.get("https://www.intelligence.senate.gov" + a['href'], headers=headers)
                         transcripts.append(res_tran.url)
                 d["transcripts"] = transcripts
-            
+            '''
             d["video_url"] = video_url
             print(d)
     
