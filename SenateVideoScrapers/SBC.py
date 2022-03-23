@@ -105,42 +105,7 @@ def get_SBC_hearings(page: int):
                 d["transcripts"] = transcripts
                 d["witness_transcripts"] = witness_transcripts
 
-            '''
-            if soup_ind.findAll('div', {'class': 'person'}) == None:
-                d["witnesses"] = ""
-            else:
-                witness_html = soup_ind.findAll('div', {'class': 'person'})
-                witness_html = [w.get_text().replace("\t", "").replace("\n", " ").replace("0x80", "") for w in witness_html]
-                witness_html = [
-                    w.replace("Hon.", "")
-                     .replace("Mr.", "")
-                     .replace("Ms.", "")
-                     .replace("Mrs.", "")
-                     .replace("Dr.", "")
-                     .replace("Ph.D.", "")
-                     .replace("PhD", "")
-                     .replace("Senator", "")
-                     .replace("Representative", "")
-                     .replace("Lt", "")
-                     .replace("The Honorable", "")
-                     .replace("Honorable", "")
-                     .replace("Ranking Member", "")
-                     .replace("Chairman", "")
-                     .replace("Chair", "")
-                     .strip() 
-                    for w in witness_html
-                ]
-
-                witness_html = [' '.join(w.split()) for w in witness_html]
-                witness_html = list(set(witness_html))
-                d["witnesses"] = witness_html
-
-                transcripts = []
-                for a in soup_ind.find_all('a', href=True): 
-                    if "Testimony" in a.text:
-                        transcripts.append("https://www.sbc.senate.gov" + a['href'])
-                d["transcripts"] = transcripts
-            '''
+            
             d["video_url"] = video_url
         
         print(d)

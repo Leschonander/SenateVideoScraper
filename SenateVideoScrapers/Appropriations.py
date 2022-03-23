@@ -88,7 +88,7 @@ def get_appropriations_hearings(rows: int):
                             transcript_pdf = soup_tran.find("a", href=re.compile("download"))
                             if transcript_pdf != None:
                                 try:
-                                    pdf_page = requests.get("https:" + transcript_pdf["href"], headers=headers)
+                                    pdf_page = requests.get(transcript_pdf["href"], headers=headers)
                                     witness_url = pdf_page.url
                                 except:
                                     witness_url = ""
@@ -96,6 +96,10 @@ def get_appropriations_hearings(rows: int):
                     witness.append(witness_name)
                     transcripts.append(witness_url)
                     witness_transcripts.append((witness_name,witness_url))
+                
+                d["witnesses"] = witness
+                d["transcripts"] = transcripts
+                d["witness_transcripts"] = witness_transcripts
 
             '''
             if soup_ind.findAll('span', {'class': 'fn'}) == None:
@@ -137,9 +141,9 @@ def get_appropriations_hearings(rows: int):
                                     transcript_links.append(pdf_page.url)
                                 except:
                                     continue
-                '''
+                
                 d["transcripts"] = transcript_links
-            
+                '''
             d["video_url"] = video_url
         print(d)
     data_table = pd.DataFrame(data)
