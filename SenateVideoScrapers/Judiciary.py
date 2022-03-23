@@ -84,15 +84,23 @@ def get_judiciary_hearings(rows: int):
                 witness_transcripts = []
 
                 for w in witness_cards:
-                    witness_name = w.find('span',  {'class': 'fn'}).get_text().replace("\t", "").replace("\n", " ").replace("0x80", "").strip()
-                    witness_name = witness_name.replace("Hon.", "").replace("Mr.", "").replace("Ms.", "").replace("Mrs.", "").replace("Dr.", "").replace("Ph.D.", "").replace("PhD", "").replace("Senator", "").replace("Representative", "").replace("Lt", "").replace("The Honorable", "").replace("(R-GA)", "").strip() 
-                    witness_name = ' '.join(witness_name.split())
+
+                    if  w.find('span',  {'class': 'fn'}) == None:
+                        witness_name = ''
+                    else: 
+                        witness_name = w.find('span',  {'class': 'fn'}).get_text().replace("\t", "").replace("\n", " ").replace("0x80", "").strip()
+                        witness_name = witness_name.replace("Hon.", "").replace("Mr.", "").replace("Ms.", "").replace("Mrs.", "").replace("Dr.", "").replace("Ph.D.", "").replace("PhD", "").replace("Senator", "").replace("Representative", "").replace("Lt", "").replace("The Honorable", "").replace("(R-GA)", "").strip() 
+                        witness_name = ' '.join(witness_name.split())
 
                     if w.find('a',  {'class': 'hearing-pdf'}) == None:
                         witness_url = ''
                     else:
                         testimony = w.find('a',  {'class': 'hearing-pdf'})
-                        if 'https:' in testimony["href"] or 'http:' in testimony["href"]:
+                        if ('https:' in testimony["href"] or 'http:' in testimony["href"]):
+                            try:
+                                res_tran = requests.get(testimony['href'], headers=headers)
+                            except:
+                                witness_url = ""
                             res_tran = requests.get(testimony['href'], headers=headers)
                             soup_tran = BeautifulSoup(res_tran.text,'html.parser')
                             transcript_pdf = soup_tran.find("a", href=re.compile("download"))

@@ -60,10 +60,19 @@ def get_intelligence_hearings(page: int):
                 witness_transcripts = []
 
                 for w in witness_cards:
-                    first_name = w.find('div', {'class': 'field-name-field-witness-firstname'}).get_text()
-                    last_name = w.find('div', {'class': 'field-name-field-witness-lastname'}).get_text()
+
+                    if w.find('div', {'class': 'field-name-field-witness-firstname'}) == None:
+                        first_name = ""
+                    else:
+                        first_name = w.find('div', {'class': 'field-name-field-witness-firstname'}).get_text()
                     
-                    witness_name = first_name + last_name
+                    if w.find('div', {'class': 'field-name-field-witness-lastname'}) == None:
+                        last_name = ""
+                    else:
+                        last_name = w.find('div', {'class': 'field-name-field-witness-lastname'}).get_text()
+                    
+                    
+                    witness_name = first_name + " " +last_name
                     witness_name = witness_name.replace("Hon.", "").replace("Mr.", "").replace("Ms.", "").replace("Mrs.", "").replace("Dr.", "").replace("Ph.D.", "").replace("PhD", "").replace("Senator", "").replace("Representative", "").replace("Lt", "").replace("The Honorable", "").replace("(R-GA)", "").strip() 
                     witness_name = ' '.join(witness_name.split())
 
@@ -71,11 +80,16 @@ def get_intelligence_hearings(page: int):
                         witness_url = ''
                     else:
                         witness_url = w.find("a", string=re.compile(r'Opening Statement|Response'))
-                        witness_url = "https://www.intelligence.senate.gov" + witness_url
+                        witness_url = "https://www.intelligence.senate.gov" + witness_url["href"]
                     
                     witness.append(witness_name)
                     transcripts.append(witness_url)
                     witness_transcripts.append((witness_name,witness_url))
+                
+
+                d["witnesses"] = witness
+                d["transcripts"] = transcripts
+                d["witness_transcripts"] = witness_transcripts
 
             '''
             if soup_ind.findAll('div', {'class': 'field-name-field-witness-firstname'}) == None:
