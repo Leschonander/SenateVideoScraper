@@ -103,49 +103,7 @@ def get_banking_hearings(rows: int):
                 d["transcripts"] = transcripts
                 d["witness_transcripts"] = witness_transcripts
             
-            '''
-            if soup_ind.findAll('span', {'class': 'fn'}) == None:
-                d["witnesses"] = ""
-            else:
-                witness_html = soup_ind.findAll('span', {'class': 'fn'})
-                witness_html = [w.get_text().replace("\t", "").replace("\n", " ").replace("0x80", "")  for w in witness_html]
-                witness_html = [
-                    w.replace("Hon.", "")
-                     .replace("Mr.", "")
-                     .replace("Ms.", "")
-                     .replace("Mrs.", "")
-                     .replace("Dr.", "")
-                     .replace("Ph.D.", "")
-                     .replace("PhD", "")
-                     .replace("Senator", "")
-                     .replace("Representative", "")
-                     .replace("Lt", "")
-                     .replace("The Honorable", "")
-                     .replace("Ranking Member", "")
-                     .replace("Chairman", "")
-                     .replace("Chair", "")
-                     .strip() 
-                    for w in witness_html
-                ]
-                witness_html = [' '.join(w.split()) for w in witness_html]
-                d["witnesses"] = witness_html
-
-                transcript_links = []
-                for a in soup_ind.find_all('a', href=True): 
-                    if "Testimony" in a.text:
-                        if 'https:' in a["href"]:
-                            res_tran = requests.get(a['href'], headers=headers)
-                            soup_tran = BeautifulSoup(res_tran.text,'html.parser')
-                            transcript_pdf = soup_tran.find("a", href=re.compile("testimony"))
-                            if transcript_pdf != None:
-                                try:
-                                    pdf_page = requests.get("https:" + transcript_pdf["href"], headers=headers)
-                                    transcript_links.append(pdf_page.url)
-                                except:
-                                    continue
-                
-                d["transcripts"] = transcript_links
-                '''
+            
             d["video_url"] = video_url
             print(d)
     data_table = pd.DataFrame(data)
