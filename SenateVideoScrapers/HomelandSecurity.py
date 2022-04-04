@@ -55,12 +55,56 @@ def get_homeland_security_hearings(page: int):
         else:
             res_ind = requests.get(d["URL"], headers=headers)
             soup_ind = BeautifulSoup(res_ind.text,'html.parser')
-            
+
             if soup_ind.find('a', { 'id': 'watch-live-now'}) == None:
                 video_url = ""
             else:
                 video_url =  soup_ind.find('a', { 'id': 'watch-live-now'})["href"].replace("javascript:openVideoWin('", "").replace("');", "")
 
+            if soup_ind.findAll('ul', {'class': 'people'}) == None or soup_ind.findAll('ul', {'class': 'people'}) == []:
+                d["witnesses"] = ""
+                d["transcripts"] = ""
+                d["witness_transcripts"] = ""
+
+            else:
+                people_list = soup_ind.find("ul", {"class": "people"})
+
+                witness_cards = people_list.findAll("li")
+                witness = []
+                transcripts = []
+                witness_transcripts = []
+
+                for w in witness_cards:
+
+                    if  w.find('span',  {'class': 'fn'}) == None:
+                        witness_name = ''
+                    else: 
+                        witness_name = w.find('span',  {'class': 'fn'}).get_text().replace("\t", "").replace("\n", " ").replace("0x80", "").strip()
+                        witness_name = witness_name.replace("Hon.", "").replace("Mr.", "").replace("Ms.", "").replace("Mrs.", "").replace("Dr.", "").replace("Ph.D.", "").replace("PhD", "").replace("Senator", "").replace("Representative", "").replace("Lt", "").replace("The Honorable", "").replace("(R-GA)", "").strip() 
+                        witness_name = ' '.join(witness_name.split())
+
+                    
+
+                    if w.find('a',  {'class': 'hearing-pdf'}) == None:
+                        witness_url = ''
+                    else:
+                        testimony = w.find('a',  {'class': 'hearing-pdf'})
+                        if 'https:' in testimony["href"] or 'http:' in testimony["href"]:
+                            try:
+                                pdf_page = requests.get(testimony["href"], headers=headers)
+                                witness_url = pdf_page.url
+                            except:
+                                witness_url = ''
+                            
+                    
+                    witness.append(witness_name)
+                    transcripts.append(witness_url)
+                    witness_transcripts.append((witness_name,witness_url))
+
+                d["witnesses"] = witness
+                d["transcripts"] = transcripts
+                d["witness_transcripts"] = witness_transcripts
+            '''
             if soup_ind.findAll('span', {'class': 'fn'}) == None:
                 d["witnesses"] = ""
             else:
@@ -94,7 +138,7 @@ def get_homeland_security_hearings(page: int):
                         res_tran = requests.get(a['href'], headers=headers)
                         transcripts.append(res_tran.url)
                 d["transcripts"] = transcripts
-
+                '''
         d["video_url"] = video_url
         print(d)
 

@@ -61,44 +61,43 @@ def get_JEC_hearings(year: int):
             
             d["video_url"] = video_url
 
-            if soup_ind.find_all("a", href=re.compile("files")) == None:
+            if soup_ind.findAll("div", {"class": "content"}) == None:
                 d["witnesses"] = ""
+                d["transcripts"] = ""
+                d["witness_transcripts"] = ""
             else:
-                witnesses = soup_ind.find_all("a", href=re.compile("files."))
-                transcripts = [w["href"]  for w in witnesses]
-                witnesses = [w.get_text().replace("0x80", "")  for w in witnesses]
-                witnesses = [
-                    w.replace("Hon.", "")
-                     .replace("Mr.", "")
-                     .replace("Ms.", "")
-                     .replace("Mrs.", "")
-                     .replace("Dr.", "")
-                     .replace("Ph.D.", "")
-                     .replace("PhD", "")
-                     .replace("Senator", "")
-                     .replace("Representative", "")
-                     .replace("Lt", "")
-                     .replace("The Honorable", "")
-                     .replace("Ranking Member", "")
-                     .replace("Vice-Chair", "")
-                     .replace("Vice Chairman", "")
-                     .replace("Chairman", "")
-                     .replace("Chairmen", "")
-                     .replace("Archived Webcast", "")
-                     .replace("'s Opening Statement", "")
-                     .replace("'s opening Statement", "")
-                     .replace("Full Hearing Transcript", "")
-                     .replace("Chair", "")
-                     .replace(", President", "")
-                     .replace(", President and CEO", "")
-                     .replace(", Senior Fellow", "")
-                     .replace("Opening Statement", "")
-                     .strip() 
-                    for w in witnesses
-                ]
-                d["witnesses"] = witnesses
-                d["transcripts"] = transcripts
+                page = soup_ind.find("div", {"class": "content"})
+                
+                if page == None or page.findAll("a", href=re.compile("files")) == None:
+                    d["witnesses"] = ""
+                    d["transcripts"] = ""
+                    d["witness_transcripts"] = ""
+                else:
+                    witness_cards = page.findAll("a", href=re.compile("files"))
+                    witness = []
+                    transcripts = []
+                    witness_transcripts = []
 
+                    for w in witness_cards:
+
+                        witness_name = w.get_text()
+                        witness_name = witness_name.replace("Hon.", "").replace("Mr.", "").replace("Ms.", "").replace("Mrs.", "").replace("Dr.", "").replace("Ph.D.", "").replace("PhD", "").replace("Senator", "").replace("Representative", "").replace("Lt", "").replace("The Honorable", "").replace("(R-GA)", "").strip() 
+                        witness_name = ' '.join(witness_name.split())
+
+                        witness_url = w['href']
+
+                        witness.append(witness_name)
+                        transcripts.append(witness_url)
+                        witness_transcripts.append((witness_name,witness_url))
+                    
+                    d["witnesses"] = witness
+                    d["transcripts"] = transcripts
+                    d["witness_transcripts"] = witness_transcripts
+            
+
+
+
+            
         print(d)
     data_table = pd.DataFrame(data)
 

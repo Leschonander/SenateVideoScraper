@@ -3,7 +3,7 @@ from bs4 import BeautifulSoup
 import pandas as pd
 import os
 from datetime import datetime
-
+import re
 
 def get_enviroment_hearings(page: int):
 
@@ -63,39 +63,46 @@ def get_enviroment_hearings(page: int):
             else:
                 video_url =  soup_ind.find('iframe', { 'class': 'embed-responsive-item'})["src"]
             
-            if soup_ind.findAll('div', {'class': 'person'}) == None:
+            if soup_ind.findAll('li', {'class': 'list-group-item'}) == None:
                 d["witnesses"] = ""
+                d["transcripts"] = ""
+                d["witness_transcripts"] = ""
             else:
-                witness_html = soup_ind.findAll('div', {'class': 'person'})
-                witness_html = [w.get_text().replace("\t", "").replace("\n", "").replace("0x80", "")  for w in witness_html]
-                witness_html = [
-                    w.replace("Hon.", "")
-                     .replace("Mr.", "")
-                     .replace("Ms.", "")
-                     .replace("Mrs.", "")
-                     .replace("Dr.", "")
-                     .replace("Ph.D.", "")
-                     .replace("PhD", "")
-                     .replace("Senator", "")
-                     .replace("Representative", "")
-                     .replace("Lt", "")
-                     .replace("The Honorable", "")
-                     .replace("Ranking Member", "")
-                     .replace("Chair", "")
-                     .replace("Chairman", "")
-                     .strip() 
-                    for w in witness_html
-                ]
-                witness_html = [' '.join(w.split()) for w in witness_html]
-                d["witnesses"] = witness_html
-
+                witness_cards = soup_ind.findAll('li', {'class': 'list-group-item'})
+                witness = []
                 transcripts = []
-                for a in soup_ind.find_all('a', href=True): 
-                    if "Testimony" in a.text:
-                        res_tran = requests.get("https://www.epw.senate.gov" + a['href'], headers=headers)
-                        transcripts.append(res_tran.url)
+                witness_transcripts = []
+
+                for w in witness_cards:
+
+                    if w.find('div',  {'class': 'person'}) == None:
+                        witness_name = ''
+                    else: 
+                        witness_name = w.find('div',  {'class': 'person'}).get_text().replace("\t", "").replace("\n", " ").replace("0x80", "").strip()
+                        witness_name = witness_name.replace("Hon.", "").replace("Mr.", "").replace("Ms.", "").replace("Mrs.", "").replace("Dr.", "").replace("Ph.D.", "").replace("PhD", "").replace("Senator", "").replace("Representative", "").replace("Lt", "").replace("The Honorable", "").replace("(R-GA)", "").strip() 
+                        witness_name = ' '.join(witness_name.split())
+                    
+                    if w.find('a', string=re.compile(r'Testimony')) == None:
+                        witness_url = ''
+                    else:
+                        testimony = w.find('a', string=re.compile(r'Testimony'))
+                        link_to_pdf = "https://www.epw.senate.gov" + testimony["href"] 
+
+                        try:
+                            pdf_page = requests.get(link_to_pdf, headers=headers)
+                            witness_url = pdf_page.url
+                        except:
+                            witness_url = ''
+
+                    witness.append(witness_name)
+                    transcripts.append(witness_url)
+                    witness_transcripts.append((witness_name,witness_url))
+
+                d["witnesses"] = witness
                 d["transcripts"] = transcripts
-        
+                d["witness_transcripts"] = witness_transcripts
+
+          
         d["video_url"] = video_url
         print(d)
     

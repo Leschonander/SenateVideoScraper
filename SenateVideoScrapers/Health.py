@@ -63,6 +63,46 @@ def get_health_hearings(rows: int):
             else:
                 video_url =  "https://www.help.senate.gov" + soup_ind.find('a', { 'id': 'watch-live-now'})["href"].replace("javascript:openVideoWin('", "").replace("');", "")
             
+            if soup_ind.findAll('li', {'class': 'vcard'}) == None:
+                d["witnesses"] = ""
+                d["transcripts"] = ""
+                d["witness_transcripts"] = ""
+
+            else:
+                witness_cards = soup_ind.findAll("li", {"class": "vcard"})
+                witness = []
+                transcripts = []
+                witness_transcripts = []
+
+                for w in witness_cards:
+                    witness_name = w.find('span',  {'class': 'fn'}).get_text().replace("\t", "").replace("\n", " ").replace("0x80", "").strip()
+                    witness_name = witness_name.replace("Hon.", "").replace("Mr.", "").replace("Ms.", "").replace("Mrs.", "").replace("Dr.", "").replace("Ph.D.", "").replace("PhD", "").replace("Senator", "").replace("Representative", "").replace("Lt", "").replace("The Honorable", "").replace("(R-GA)", "").strip() 
+                    witness_name = ' '.join(witness_name.split())
+
+                    if w.find('a',  {'class': 'hearing-pdf'}) == None:
+                        witness_url = ''
+                    else:
+                        testimony = w.find('a',  {'class': 'hearing-pdf'})
+                        if ('https:' in testimony["href"] or 'http:' in testimony["href"]) and "https://www.help.senate.gov" in testimony["href"]:
+                            res_tran = requests.get(testimony['href'], headers=headers)
+                            soup_tran = BeautifulSoup(res_tran.text,'html.parser')
+                            transcript_pdf = soup_tran.find("a", href=re.compile("download"))
+                            if transcript_pdf != None:
+                                try:
+                                    pdf_page = requests.get(transcript_pdf["href"], headers=headers)
+                                    witness_url = pdf_page.url
+                                except:
+                                    witness_url = ""
+                    
+                    witness.append(witness_name)
+                    transcripts.append(witness_url)
+                    witness_transcripts.append((witness_name,witness_url))
+
+                d["witnesses"] = witness
+                d["transcripts"] = transcripts
+                d["witness_transcripts"] = witness_transcripts
+
+            '''
             if soup_ind.findAll('span', {'class': 'fn'}) == None:
                 d["witnesses"] = ""
             else:
@@ -114,7 +154,7 @@ def get_health_hearings(rows: int):
                                     continue
                 
                 d["transcripts"] = transcript_links
-            
+                '''
             d["video_url"] = video_url
         print(d)
     data_table = pd.DataFrame(data)
