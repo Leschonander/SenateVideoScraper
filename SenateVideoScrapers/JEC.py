@@ -68,21 +68,38 @@ def get_JEC_hearings(year: int):
             else:
                 page = soup_ind.find("div", {"class": "content"})
                 
-                if page == None or page.findAll("a", href=re.compile("files")) == None:
+
+                
+                if page == None or page.findAll("a", href=re.compile("files|Files")) == None:
                     d["witnesses"] = ""
                     d["transcripts"] = ""
                     d["witness_transcripts"] = ""
                 else:
-                    witness_cards = page.findAll("a", href=re.compile("files"))
+                    
+
+                    witness_cards = page.findAll("a", href=re.compile("files|Files"))
                     witness = []
                     transcripts = []
                     witness_transcripts = []
-
+                    # print(d["Date"])
                     for w in witness_cards:
-
-                        witness_name = w.get_text()
-                        witness_name = witness_name.replace("Hon.", "").replace("Mr.", "").replace("Ms.", "").replace("Mrs.", "").replace("Dr.", "").replace("Ph.D.", "").replace("PhD", "").replace("Senator", "").replace("Representative", "").replace("Lt", "").replace("The Honorable", "").replace("(R-GA)", "").strip() 
-                        witness_name = ' '.join(witness_name.split())
+                        if '2018' in d["Date"]:
+                            potential_witness_name = str(w.parent)
+                            if("<br/>" in potential_witness_name):
+                                potential_witness_name = potential_witness_name.split("<br/>")[0]
+                                potential_witness_name = potential_witness_name.split(",")[0]
+                                potential_witness_name = potential_witness_name.replace("<p>", "")
+                                potential_witness_name = potential_witness_name.replace("Hon.", "").replace("Mr.", "").replace("Ms.", "").replace("Mrs.", "").replace("Dr.", "").replace("Ph.D.", "").replace("PhD", "").replace("Senator", "").replace("Representative", "").replace("Lt", "").replace("The Honorable", "").replace("(R-GA)", "").strip() 
+                                witness_name = potential_witness_name
+                            else:
+                                print(w)
+                                witness_name = w.get_text()
+                                witness_name = witness_name.replace("Hon.", "").replace("Mr.", "").replace("Ms.", "").replace("Mrs.", "").replace("Dr.", "").replace("Ph.D.", "").replace("PhD", "").replace("Senator", "").replace("Representative", "").replace("Lt", "").replace("The Honorable", "").replace("(R-GA)", "").strip() 
+                                witness_name = ' '.join(witness_name.split())
+                        else:
+                            witness_name = w.get_text()
+                            witness_name = witness_name.replace("Hon.", "").replace("Mr.", "").replace("Ms.", "").replace("Mrs.", "").replace("Dr.", "").replace("Ph.D.", "").replace("PhD", "").replace("Senator", "").replace("Representative", "").replace("Lt", "").replace("The Honorable", "").replace("(R-GA)", "").strip() 
+                            witness_name = ' '.join(witness_name.split())
 
                         witness_url = w['href']
 
@@ -93,11 +110,7 @@ def get_JEC_hearings(year: int):
                     d["witnesses"] = witness
                     d["transcripts"] = transcripts
                     d["witness_transcripts"] = witness_transcripts
-            
-
-
-
-            
+                        
         print(d)
     data_table = pd.DataFrame(data)
 
