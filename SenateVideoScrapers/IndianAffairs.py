@@ -77,8 +77,11 @@ def get_indian_affairs_hearings(page: int):
                         witness_url = ''
                     else:
                         link = w.find('a', string=re.compile(r'Testimony'))
-                        witness_url = "https://www.indian.senate.gov" + link["href"]
-                    
+                        url_not_present = re.compile("http(s)?://www.indian.senate.gov|http://indian.senate.gov").search(link["href"]) == None
+                        if url_not_present == True:
+                            witness_url = "https://www.indian.senate.gov" + link["href"]
+                        else:
+                            witness_url = link["href"]
                     witness.append(witness_name)
                     transcripts.append(witness_url)
                     witness_transcripts.append((witness_name,witness_url))
@@ -86,39 +89,7 @@ def get_indian_affairs_hearings(page: int):
                 d["witnesses"] = witness
                 d["transcripts"] = transcripts
                 d["witness_transcripts"] = witness_transcripts
-            '''
-            if soup_ind.findAll('div', {'class': 'group-header'}) == None:
-                d["witnesses"] = []
-            else:
-                witnesses =  soup_ind.findAll('div', {'class': 'group-header'})
-                
-                witnesses = [w.get_text().replace("\n", "").replace("\xa0", "").strip().replace("0x80", "")  for w in witnesses]
-                witnesses = [
-                    w.replace("Hon.", "")
-                     .replace("Mr.", "")
-                     .replace("Ms.", "")
-                     .replace("Mrs.", "")
-                     .replace("Dr.", "")
-                     .replace("Ph.D.", "")
-                     .replace("PhD", "")
-                     .replace("Senator", "")
-                     .replace("Representative", "")
-                     .replace("Lt", "")
-                     .replace("The Honorable", "")
-                     .replace("Ranking Member", "")
-                     .replace("Chair", "")
-                     .replace("Chairman", "")
-                     .strip() 
-                    for w in witnesses
-                ]
-                d["witnesses"] = witnesses
-
-                transcripts = []
-                for a in soup_ind.find_all('a', href=True): 
-                    if "Testimony" in a.text:
-                        transcripts.append("https://www.indian.senate.gov" + a['href'])
-                d["transcripts"] = transcripts
-                '''
+            
         print(d)
         d["video_url"] = video_url
 
@@ -141,7 +112,7 @@ if os.path.exists("./SenateVideoFiles/IndianAffairs.csv") == True:
     combined_data.to_csv("./SenateVideoFiles/IndianAffairs.csv",  encoding='utf-8')
 
 else:
-    pages = [i for i in range(0, 49)]
+    pages = [i for i in range(0, 49)] #0 ,49
     data_table_list = []
     for p in pages:
         result = get_indian_affairs_hearings(p)
