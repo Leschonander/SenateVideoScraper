@@ -31,3 +31,4 @@ print(data_frames)
 data_frames.to_csv("./SenateVideoFiles/MasterFile.csv",  encoding='utf-8', index=False)
 
 os.system(f"python3 witnessCounts.py")
+os.system(f"Rscript TagFiles.R")
