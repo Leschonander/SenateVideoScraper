@@ -47,7 +47,9 @@ def get_homeland_security_hearings(page: int):
             "Committee": "Homeland Security",
             "Date Scraped": datetime.today().strftime("%Y-%m-%d")
         }
-        data.append(row_obj)
+
+        if "AM" in row_obj["Time"] or "PM" in row_obj["Time"]:
+            data.append(row_obj)
     
     for d in data:
         if d["URL"] == "":
@@ -104,41 +106,7 @@ def get_homeland_security_hearings(page: int):
                 d["witnesses"] = witness
                 d["transcripts"] = transcripts
                 d["witness_transcripts"] = witness_transcripts
-            '''
-            if soup_ind.findAll('span', {'class': 'fn'}) == None:
-                d["witnesses"] = ""
-            else:
-                witness_html = soup_ind.findAll('span', {'class': 'fn'})
-                witness_html = [w.get_text().replace("\t", "").replace("\n", " ").replace("0x80", "")  for w in witness_html]
-                witness_html = [i for i in witness_html if "(" not in i]
-                witness_html = [
-                    w.replace("Hon.", "")
-                     .replace("Mr.", "")
-                     .replace("Ms.", "")
-                     .replace("Mrs.", "")
-                     .replace("Dr.", "")
-                     .replace("Ph.D.", "")
-                     .replace("PhD", "")
-                     .replace("Senator", "")
-                     .replace("Representative", "")
-                     .replace("Lt", "")
-                     .replace("The Honorable", "")
-                     .replace(", PH.D.", "")
-                     .replace(", D.PHIL.", "")
-                     .strip() 
-                    for w in witness_html
-                ]
-                witness_html = [' '.join(w.split()) for w in witness_html]
-                witness_html = list(set(witness_html))
-                d["witnesses"] = witness_html
-
-                transcripts = []
-                for a in soup_ind.find_all('a', href=True): 
-                    if "Download Testimony" in a.text:
-                        res_tran = requests.get(a['href'], headers=headers)
-                        transcripts.append(res_tran.url)
-                d["transcripts"] = transcripts
-                '''
+            
         d["video_url"] = video_url
         print(d)
 

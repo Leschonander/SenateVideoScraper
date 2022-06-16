@@ -49,8 +49,9 @@ def get_banking_hearings(rows: int):
             "Committee": "Banking",
             "Date Scraped": datetime.today().strftime("%Y-%m-%d")
         }
-        
-        data.append(row_obj)
+
+        if "AM" in row_obj["Time"] or "PM" in row_obj["Time"]:
+            data.append(row_obj)
     
     for d in data:
         if d["URL"] == "":
