@@ -1,10 +1,27 @@
-
 import requests
 from bs4 import BeautifulSoup
 import pandas as pd
 import os
 from datetime import datetime
 import re
+import logging
+import sentry_sdk
+from sentry_sdk import capture_message
+from sentry_sdk.integrations.logging import LoggingIntegration
+
+
+sentry_logging = LoggingIntegration(
+    level=logging.DEBUG,       
+    event_level=logging.DEBUG  
+)
+sentry_sdk.init(
+    dsn="https://86cfcc7aa2684432aeae66f12af6d41d@o1310513.ingest.sentry.io/6558017",
+    integrations=[
+        sentry_logging,
+    ],
+    traces_sample_rate=1.0,
+)
+
 
 def get_agricultural_hearings(rows: int):
 
@@ -17,7 +34,8 @@ def get_agricultural_hearings(rows: int):
 
     soup =  BeautifulSoup(res.text,'html.parser')
     
-    table_rows = soup.findAll('tr', { 'class': 'vevent'})
+    
+    table_rows = soup.findAll('div', { 'class': 'row'})
     data = []
     for t in table_rows:
         if t.find('time', {'class': 'dtstart'}) == None:
@@ -28,17 +46,22 @@ def get_agricultural_hearings(rows: int):
             date = date_time[0]
             time = date_time[1]
         
-        if t.find('a', {'class': 'summary'}) == None:
+        if t.find('a', {'class': 'LegislationList__link'}) == None:
             url = ""
             title = ""
         else:
-            url = "https://www.agriculture.senate.gov" + t.find('a', {'class': 'summary'})["href"]
-            title = t.find('a', {'class': 'summary'}).get_text().replace("\n", "").replace("\t", "")
+            url = t.find('a', {'class': 'LegislationList__link'})["href"]
+            title = t.find('a', {'class': 'LegislationList__link'}).get_text().replace("\n", "").replace("\t", "")
         
-        if t.find('span', {'class': 'location'}) == None:
+        if t.findAll("div", {'class': "col-md-3"}) == None:
             location = ""
+            #print(t.findAll("div", {'class': "col-md-3"}))
         else:
-            location =  t.find('span', {'class': 'location'}).get_text()
+            location = t.findAll("div", {'class': "col-md-3"})
+            if len(location) != 2:
+                location = ""
+            else:
+                location = t.findAll("div", {'class': "col-md-3"})[1].get_text()
         
         row_obj = {
             "Date": date,
@@ -57,29 +80,32 @@ def get_agricultural_hearings(rows: int):
             d["video_url"] = ""
         else:
             res_ind = requests.get(d["URL"], headers=headers)
+            
             soup_ind = BeautifulSoup(res_ind.text,'html.parser')
 
-            if soup_ind.findAll('li', {'class': 'vcard'}) == None:
+            if soup_ind.findAll('li', {'class': 'col-md-6'}) == None:
                 d["witnesses"] = ""
                 d["transcripts"] = ""
                 d["witness_transcripts"] = ""
 
+                logging.error(f'{d["Title"]} at {d["Date"]} lacks witness and transcript information.')
+
             else:
 
-                witness_cards = soup_ind.findAll("li", {"class": "vcard"})
+                witness_cards = soup_ind.findAll("li", {"class": "col-md-6"})
                 witness = []
                 transcripts = []
                 witness_transcripts = []
 
                 for w in witness_cards:
-                    witness_name = w.find('span',  {'class': 'fn'}).get_text().replace("\t", "").replace("\n", " ").replace("0x80", "").strip()
+                    witness_name = w.find('h4',  {'class': 'Heading__title'}).get_text().replace("\t", "").replace("\n", " ").replace("0x80", "").strip()
                     witness_name = witness_name.replace("Hon.", "").replace("Mr.", "").replace("Ms.", "").replace("Mrs.", "").replace("Dr.", "").replace("Ph.D.", "").replace("PhD", "").replace("Senator", "").replace("Representative", "").replace("Lt", "").replace("The Honorable", "").replace("(R-GA)", "").strip() 
                     witness_name = ' '.join(witness_name.split())
 
-                    if w.find('a',  {'class': 'hearing-pdf'}) == None:
+                    if w.find('a',  {'class': 'Button--hearingLink'}) == None:
                         witness_url = ''
                     else:
-                        testimony = w.find('a',  {'class': 'hearing-pdf'})
+                        testimony = w.find('a',  {'class': 'Button--hearingLink'})
                         if 'https:' in testimony["href"] or 'http:' in testimony["href"]:
                             res_tran = requests.get(testimony['href'], headers=headers)
                             soup_tran = BeautifulSoup(res_tran.text,'html.parser')
@@ -89,6 +115,8 @@ def get_agricultural_hearings(rows: int):
                                 witness_url = pdf_page.url
                             else:
                                 witness_url = ''
+                                logging.error(f'{d["Title"]} at {d["Date"]} lacks a url for their testimony.')
+
                     
                     witness.append(witness_name)
                     transcripts.append(witness_url)
@@ -99,14 +127,16 @@ def get_agricultural_hearings(rows: int):
                 d["witness_transcripts"] = witness_transcripts
 
                
-            if soup_ind.find('a', { 'id': 'watch-live-now'}) == None:
+            if soup_ind.find('iframe') == None:
                 video_url = ""
             else:
-                video_url =  "https://www.agriculture.senate.gov" + soup_ind.find('a', { 'id': 'watch-live-now'})["href"].replace("javascript:openVideoWin('", "").replace("');", "")
+                video_url =   soup_ind.find('iframe')['src']
             
             d["video_url"] = video_url
         print(d)
     data_table = pd.DataFrame(data)
+    data_table = data_table.dropna(subset=["witnesses"])
+
     print(data_table)
 
     return data_table
