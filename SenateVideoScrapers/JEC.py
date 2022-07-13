@@ -10,13 +10,16 @@ import sentry_sdk
 from sentry_sdk import capture_message
 from sentry_sdk.integrations.logging import LoggingIntegration
 
+load_dotenv()
+
+
 
 sentry_logging = LoggingIntegration(
     level=logging.DEBUG,       
     event_level=logging.DEBUG  
 )
 sentry_sdk.init(
-    dsn="https://86cfcc7aa2684432aeae66f12af6d41d@o1310513.ingest.sentry.io/6558017",
+    dsn=os.getenv('SENTRY_DSN'),
     integrations=[
         sentry_logging,
     ],

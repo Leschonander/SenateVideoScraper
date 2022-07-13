@@ -4,6 +4,24 @@ import pandas as pd
 import os
 from datetime import datetime
 import re
+import logging
+import sentry_sdk
+from sentry_sdk import capture_message
+from sentry_sdk.integrations.logging import LoggingIntegration
+
+load_dotenv()
+
+sentry_logging = LoggingIntegration(
+    level=logging.DEBUG,       
+    event_level=logging.DEBUG  
+)
+sentry_sdk.init(
+    dsn=os.getenv('SENTRY_DSN'),
+    integrations=[
+        sentry_logging,
+    ],
+    traces_sample_rate=1.0,
+)
 
 def get_enviroment_hearings(page: int):
 
@@ -67,6 +85,7 @@ def get_enviroment_hearings(page: int):
                 d["witnesses"] = ""
                 d["transcripts"] = ""
                 d["witness_transcripts"] = ""
+                logging.error(f'{d["Title"]} at {d["Date"]} lacks witness and transcript information.')
             else:
                 witness_cards = soup_ind.findAll('li', {'class': 'list-group-item'})
                 witness = []
@@ -84,6 +103,7 @@ def get_enviroment_hearings(page: int):
                     
                     if w.find('a', string=re.compile(r'Testimony')) == None:
                         witness_url = ''
+                        logging.error(f'{d["Title"]} at {d["Date"]} lacks a url for their testimony.')
                     else:
                         testimony = w.find('a', string=re.compile(r'Testimony'))
                         link_to_pdf = "https://www.epw.senate.gov" + testimony["href"] 
@@ -93,6 +113,7 @@ def get_enviroment_hearings(page: int):
                             witness_url = pdf_page.url
                         except:
                             witness_url = ''
+                            logging.error(f'{d["Title"]} at {d["Date"]} lacks a url for their testimony.')
 
                     witness.append(witness_name)
                     transcripts.append(witness_url)

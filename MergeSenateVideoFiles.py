@@ -1,25 +1,23 @@
 import pandas as pd
 import os
+from dotenv import load_dotenv
 import time
 import logging
 import sentry_sdk
+from sentry_sdk import capture_message
 from sentry_sdk.integrations.logging import LoggingIntegration
 
-# This is the base case, that you want all files. Warning if you are 
-# setting it up for the first time, it may take sometime
+load_dotenv()
+
 sentry_logging = LoggingIntegration(
-    level=logging.INFO,        # Capture info and above as breadcrumbs
-    event_level=logging.ERROR  # Send errors as events
+    level=logging.DEBUG,       
+    event_level=logging.DEBUG  
 )
 sentry_sdk.init(
-    dsn="https://86cfcc7aa2684432aeae66f12af6d41d@o1310513.ingest.sentry.io/6558017",
+    dsn=os.getenv('SENTRY_DSN'),
     integrations=[
         sentry_logging,
     ],
-
-    # Set traces_sample_rate to 1.0 to capture 100%
-    # of transactions for performance monitoring.
-    # We recommend adjusting this value in production,
     traces_sample_rate=1.0,
 )
 

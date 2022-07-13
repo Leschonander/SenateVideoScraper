@@ -4,6 +4,25 @@ import pandas as pd
 import os
 from datetime import datetime
 import re
+import logging
+import sentry_sdk
+from sentry_sdk import capture_message
+from sentry_sdk.integrations.logging import LoggingIntegration
+
+load_dotenv()
+
+sentry_logging = LoggingIntegration(
+    level=logging.DEBUG,       
+    event_level=logging.DEBUG  
+)
+sentry_sdk.init(
+    dsn=os.getenv('SENTRY_DSN'),
+    integrations=[
+        sentry_logging,
+    ],
+    traces_sample_rate=1.0,
+)
+
 
 def get_intelligence_hearings(page: int):
 
@@ -53,6 +72,7 @@ def get_intelligence_hearings(page: int):
             
             if soup_ind.findAll('div', {'class': 'entity'}) == None:
                 d["witnesses"] = ""
+                logging.error(f'{d["Title"]} at {d["Date"]} lacks witness and transcript information.')
             else:
                 witness_cards = soup_ind.findAll("div", {"class": "entity"})
                 witness = []
@@ -78,6 +98,8 @@ def get_intelligence_hearings(page: int):
 
                     if w.find("a", string=re.compile(r'Opening Statement|Response')) == None:
                         witness_url = ''
+                        logging.error(f'{d["Title"]} at {d["Date"]} lacks a url for their testimony.')
+
                     else:
                         witness_url = w.find("a", string=re.compile(r'Opening Statement|Response'))
                         witness_url = "https://www.intelligence.senate.gov" + witness_url["href"]
@@ -91,44 +113,7 @@ def get_intelligence_hearings(page: int):
                 d["transcripts"] = transcripts
                 d["witness_transcripts"] = witness_transcripts
 
-            '''
-            if soup_ind.findAll('div', {'class': 'field-name-field-witness-firstname'}) == None:
-                d["witnesses"] = ""
-            else:
-
-                first_name = soup_ind.findAll('div', {'class': 'field-name-field-witness-firstname'})
-                last_name = soup_ind.findAll('div', {'class': 'field-name-field-witness-lastname'})
-                
-                first_name = [f.get_text() for f in first_name]
-                last_name = [l.get_text() for l in last_name]
-                witness_html = list(zip(first_name, last_name))
-                witness_html = [w[0] + " " + w[1] for w in witness_html]
-                witness_html = [
-                    w.replace("Hon.", "")
-                     .replace("Mr.", "")
-                     .replace("Ms.", "")
-                     .replace("Mrs.", "")
-                     .replace("Dr.", "")
-                     .replace("Ph.D.", "")
-                     .replace("PhD", "")
-                     .replace("Senator", "")
-                     .replace("Representative", "")
-                     .replace("Lt", "")
-                     .replace("The Honorable", "")
-                     .replace("Ranking Member", "")
-                     .replace("Chair", "")
-                     .strip() 
-                    for w in witness_html
-                ]
-                d["witnesses"] = witness_html
-
-                transcripts = []
-                for a in soup_ind.find_all('a', href=True): 
-                    if "Opening Statement" in a.text or "Response" in a.text:
-                        res_tran = requests.get("https://www.intelligence.senate.gov" + a['href'], headers=headers)
-                        transcripts.append(res_tran.url)
-                d["transcripts"] = transcripts
-            '''
+            
             d["video_url"] = video_url
             print(d)
     

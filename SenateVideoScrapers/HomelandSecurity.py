@@ -3,6 +3,26 @@ from bs4 import BeautifulSoup
 import pandas as pd
 import os 
 from datetime import datetime
+from dotenv import load_dotenv
+import logging
+import sentry_sdk
+from sentry_sdk import capture_message
+from sentry_sdk.integrations.logging import LoggingIntegration
+
+load_dotenv()
+
+sentry_logging = LoggingIntegration(
+    level=logging.DEBUG,       
+    event_level=logging.DEBUG  
+)
+sentry_sdk.init(
+    dsn=os.getenv('SENTRY_DSN'),
+    integrations=[
+        sentry_logging,
+    ],
+    traces_sample_rate=1.0,
+)
+
 
 def get_homeland_security_hearings(page: int):
 
@@ -68,6 +88,8 @@ def get_homeland_security_hearings(page: int):
                 d["transcripts"] = ""
                 d["witness_transcripts"] = ""
 
+                logging.error(f'{d["Title"]} at {d["Date"]} lacks witness and transcript information.')
+
             else:
                 people_list = soup_ind.find("ul", {"class": "people"})
 
@@ -97,6 +119,7 @@ def get_homeland_security_hearings(page: int):
                                 witness_url = pdf_page.url
                             except:
                                 witness_url = ''
+                                logging.error(f'{d["Title"]} at {d["Date"]} lacks a url for their testimony.')
                             
                     
                     witness.append(witness_name)
