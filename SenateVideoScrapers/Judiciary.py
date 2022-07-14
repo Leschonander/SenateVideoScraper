@@ -5,7 +5,24 @@ import os
 from datetime import datetime
 import re
 from urllib.parse import urlparse
+import logging
+import sentry_sdk
+from sentry_sdk import capture_message
+from sentry_sdk.integrations.logging import LoggingIntegration
 
+load_dotenv()
+
+sentry_logging = LoggingIntegration(
+    level=logging.DEBUG,       
+    event_level=logging.DEBUG  
+)
+sentry_sdk.init(
+    dsn=os.getenv('SENTRY_DSN'),
+    integrations=[
+        sentry_logging,
+    ],
+    traces_sample_rate=1.0,
+)
 
 def get_judiciary_hearings(rows: int):
 
@@ -76,6 +93,7 @@ def get_judiciary_hearings(rows: int):
                 d["witnesses"] = ""
                 d["transcripts"] = ""
                 d["witness_transcripts"] = ""
+                logging.error(f'{d["Title"]} at {d["Date"]} lacks witness and transcript information.')
 
             else:
                 witness_cards = soup_ind.findAll("div", {"class": "vcard"})
@@ -94,6 +112,7 @@ def get_judiciary_hearings(rows: int):
 
                     if w.find('a',  {'class': 'hearing-pdf'}) == None:
                         witness_url = ''
+                        logging.error(f'{d["Title"]} at {d["Date"]} lacks a url for their testimony.')
                     else:
                         testimony = w.find('a',  {'class': 'hearing-pdf'})
                         if ('https:' in testimony["href"] or 'http:' in testimony["href"]):
@@ -101,6 +120,7 @@ def get_judiciary_hearings(rows: int):
                                 res_tran = requests.get(testimony['href'], headers=headers)
                             except:
                                 witness_url = ""
+                                logging.error(f'{d["Title"]} at {d["Date"]} lacks a url for their testimony.')
                             res_tran = requests.get(testimony['href'], headers=headers)
                             soup_tran = BeautifulSoup(res_tran.text,'html.parser')
                             transcript_pdf = soup_tran.find("a", href=re.compile("download"))
@@ -110,6 +130,7 @@ def get_judiciary_hearings(rows: int):
                                     witness_url = pdf_page.url
                                 except:
                                     witness_url = ""
+                                    logging.error(f'{d["Title"]} at {d["Date"]} lacks a url for their testimony.')
                     
                     witness.append(witness_name)
                     transcripts.append(witness_url)

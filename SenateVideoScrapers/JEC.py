@@ -5,6 +5,27 @@ from bs4 import BeautifulSoup
 import pandas as pd
 import os
 from datetime import datetime
+import logging
+import sentry_sdk
+from sentry_sdk import capture_message
+from sentry_sdk.integrations.logging import LoggingIntegration
+
+load_dotenv()
+
+
+
+sentry_logging = LoggingIntegration(
+    level=logging.DEBUG,       
+    event_level=logging.DEBUG  
+)
+sentry_sdk.init(
+    dsn=os.getenv('SENTRY_DSN'),
+    integrations=[
+        sentry_logging,
+    ],
+    traces_sample_rate=1.0,
+)
+
 
 def get_JEC_hearings(year: int):
 
@@ -74,6 +95,7 @@ def get_JEC_hearings(year: int):
                     d["witnesses"] = ""
                     d["transcripts"] = ""
                     d["witness_transcripts"] = ""
+                    logging.error(f'{d["Title"]} at {d["Date"]} lacks witness and transcript information.')
                 else:
                     
 

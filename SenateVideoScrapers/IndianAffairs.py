@@ -4,6 +4,12 @@ import pandas as pd
 import os
 from datetime import datetime
 import re
+import logging
+import sentry_sdk
+from sentry_sdk import capture_message
+from sentry_sdk.integrations.logging import LoggingIntegration
+
+load_dotenv()
 
 def get_indian_affairs_hearings(page: int):
 
@@ -59,6 +65,7 @@ def get_indian_affairs_hearings(page: int):
                 d["witnesses"] = ""
                 d["transcripts"] = ""
                 d["witness_transcripts"] = ""
+                logging.error(f'{d["Title"]} at {d["Date"]} lacks witness and transcript information.')
             else:
                 witness_cards = soup_ind.findAll('div', {'class': 'field-item'})
                 witness = []
@@ -75,6 +82,7 @@ def get_indian_affairs_hearings(page: int):
 
                     if w.find('a', string=re.compile(r'Testimony')) == None:
                         witness_url = ''
+                        logging.error(f'{d["Title"]} at {d["Date"]} lacks a url for their testimony.')
                     else:
                         link = w.find('a', string=re.compile(r'Testimony'))
                         url_not_present = re.compile("http(s)?://www.indian.senate.gov|http://indian.senate.gov").search(link["href"]) == None

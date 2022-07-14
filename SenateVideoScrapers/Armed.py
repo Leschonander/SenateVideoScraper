@@ -4,6 +4,24 @@ import pandas as pd
 import os 
 from datetime import datetime
 import re
+import logging
+import sentry_sdk
+from sentry_sdk import capture_message
+from sentry_sdk.integrations.logging import LoggingIntegration
+
+load_dotenv()
+
+sentry_logging = LoggingIntegration(
+    level=logging.DEBUG,       
+    event_level=logging.DEBUG  
+)
+sentry_sdk.init(
+    dsn=os.getenv('SENTRY_DSN'),
+    integrations=[
+        sentry_logging,
+    ],
+    traces_sample_rate=1.0,
+)
 
 def get_armed_hearings(rows: int):
 
@@ -66,6 +84,8 @@ def get_armed_hearings(rows: int):
                 d["witnesses"] = ""
                 d["transcripts"] = ""
                 d["witness_transcripts"] = ""
+                logging.error(f'{d["Title"]} at {d["Date"]} lacks witness and transcript information.')
+
 
             else:
                 witness_cards = soup_ind.findAll("li", {"class": "vcard"})
@@ -80,6 +100,7 @@ def get_armed_hearings(rows: int):
 
                     if w.find('a',  {'class': 'hearing-pdf'}) == None:
                         witness_url = ''
+                        logging.error(f'{d["Title"]} at {d["Date"]} lacks a url for their testimony.')
                     else:
                         testimony = w.find('a',  {'class': 'hearing-pdf'})
                         if 'https:' in testimony["href"] or 'http:' in testimony["href"]:
@@ -92,6 +113,7 @@ def get_armed_hearings(rows: int):
                                     witness_url = pdf_page.url
                                 except:
                                     witness_url = ""
+                                    logging.error(f'{d["Title"]} at {d["Date"]} lacks a url for their testimony.')
                     
                     witness.append(witness_name)
                     transcripts.append(witness_url)
@@ -101,57 +123,6 @@ def get_armed_hearings(rows: int):
                 d["transcripts"] = transcripts
                 d["witness_transcripts"] = witness_transcripts
 
-            '''
-            if soup_ind.findAll('span', {'class': 'fn'}) == None:
-                d["witnesses"] = ""
-            else:
-                witness_html = soup_ind.findAll('span', {'class': 'fn'})
-                witness_html = [w.get_text().replace("\t", "").replace("\n", " ").replace("0x80", "")  for w in witness_html]
-                witness_html = [
-                    w.replace("Hon.", "")
-                     .replace("Mr.", "")
-                     .replace("Ms.", "")
-                     .replace("Mrs.", "")
-                     .replace("Dr.", "")
-                     .replace("Ph.D.", "")
-                     .replace("PhD", "")
-                     .replace("Senator", "")
-                     .replace("Representative", "")
-                     .replace("Lt", "")
-                     .replace("The Honorable", "")
-                     .replace("Ranking Member", "")
-                     .replace("Chair", "")
-                     .replace("Chairman", "")
-                     .replace(", USN", "")
-                     .replace(", USA", "")
-                     .replace(", USMC", "")
-                     .replace(", USN", "")
-                     .replace(", USCG", "")
-                     .replace(", USAF", "")
-                     .replace("**", "")
-                     .strip() 
-                    for w in witness_html
-                ]
-                witness_html = [' '.join(w.split()) for w in witness_html]
-                witness_html = list(set(witness_html))
-                d["witnesses"] = witness_html
-
-                transcript_links = []
-                for a in soup_ind.find_all('a', {"class": "hearing-pdf"}): 
-                    if 'https:' in a["href"]:
-                            res_tran = requests.get(a['href'], headers=headers)
-                        
-                            soup_tran = BeautifulSoup(res_tran.text,'html.parser')
-                            transcript_pdf = soup_tran.find("a", href=re.compile("download"))
-                            if transcript_pdf != None:
-                                try:
-                                    pdf_page = requests.get(transcript_pdf["href"], headers=headers)
-                                    transcript_links.append(pdf_page.url)
-                                except:
-                                    continue
-                
-                d["transcripts"] = transcript_links
-            '''
             d["video_url"] = video_url
         print(d)
     data_table = pd.DataFrame(data)

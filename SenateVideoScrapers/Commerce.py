@@ -3,6 +3,24 @@ from bs4 import BeautifulSoup
 import pandas as pd
 import os
 from datetime import datetime
+import logging
+import sentry_sdk
+from sentry_sdk import capture_message
+from sentry_sdk.integrations.logging import LoggingIntegration
+
+load_dotenv()
+
+sentry_logging = LoggingIntegration(
+    level=logging.DEBUG,       
+    event_level=logging.DEBUG  
+)
+sentry_sdk.init(
+    dsn=os.getenv('SENTRY_DSN'),
+    integrations=[
+        sentry_logging,
+    ],
+    traces_sample_rate=1.0,
+)
 
 def get_commerce_hearings(year: int):
 
@@ -61,6 +79,7 @@ def get_commerce_hearings(year: int):
                 d["witnesses"] = ""
                 d["transcripts"] = ""
                 d["witness_transcripts"] = ""
+                logging.error(f'{d["Title"]} at {d["Date"]} lacks witness and transcript information.')
             else:
                 witness_cards = soup_ind.findAll("li", {"class": "hearing-statement"})
                 witness = []
@@ -73,6 +92,7 @@ def get_commerce_hearings(year: int):
                     witness_name = ' '.join(witness_name.split())
                     if w.find('a') == None:
                         witness_url = ''
+                        logging.error(f'{d["Title"]} at {d["Date"]} lacks a url for their testimony.')
                     else:
                         testimony = w.find("a")['href']
                         if 'https:' in testimony or 'http:' in testimony:
@@ -84,6 +104,7 @@ def get_commerce_hearings(year: int):
                                 witness_url = res_tran.url
                         else:
                             witness_url = ''
+                            logging.error(f'{d["Title"]} at {d["Date"]} lacks a url for their testimony.')
                     
                     witness.append(witness_name)
                     transcripts.append(witness_url)

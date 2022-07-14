@@ -1,9 +1,26 @@
 import pandas as pd
 import os
+from dotenv import load_dotenv
 import time
+import logging
+import sentry_sdk
+from sentry_sdk import capture_message
+from sentry_sdk.integrations.logging import LoggingIntegration
 
-# This is the base case, that you want all files. Warning if you are 
-# setting it up for the first time, it may take sometime
+load_dotenv()
+
+sentry_logging = LoggingIntegration(
+    level=logging.DEBUG,       
+    event_level=logging.DEBUG  
+)
+sentry_sdk.init(
+    dsn=os.getenv('SENTRY_DSN'),
+    integrations=[
+        sentry_logging,
+    ],
+    traces_sample_rate=1.0,
+)
+
 
 scripts = os.listdir("./SenateVideoScrapers")
 for s in scripts:
@@ -32,3 +49,5 @@ data_frames.to_csv("./SenateVideoFiles/MasterFile.csv",  encoding='utf-8', index
 
 os.system(f"python3 witnessCounts.py")
 os.system(f"Rscript TagFiles.R")
+
+logging.info("Scraper run complete")
