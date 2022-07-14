@@ -8,6 +8,8 @@ import logging
 import sentry_sdk
 from sentry_sdk import capture_message
 from sentry_sdk.integrations.logging import LoggingIntegration
+from dotenv import load_dotenv
+
 
 load_dotenv()
 
