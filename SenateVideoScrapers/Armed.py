@@ -86,7 +86,8 @@ def get_armed_hearings(rows: int):
                 d["witnesses"] = ""
                 d["transcripts"] = ""
                 d["witness_transcripts"] = ""
-                logging.error(f'{d["Title"]} at {d["Date"]} lacks witness and transcript information.')
+                if "Closed" not in d["Title"] or "RSCHEDULED" not in d["Title"] or "POSTPONED" not in d["Title"]  or time.strptime(d["Date"], '%m/%d/%y') > datetime.today():
+                    logging.error(f'{d["Title"]} at {d["Date"]} lacks a url for their testimony.')
 
 
             else:
@@ -136,6 +137,7 @@ if os.path.exists("./SenateVideoFiles/Armed.csv") == True:
     new_data = get_armed_hearings(rows=20)
     old_data = pd.read_csv("./SenateVideoFiles/Armed.csv")
     combined_data = pd.concat([new_data, old_data])
+    combined_data = combined_data[["Date","Time","URL","Title","Location","Committee","Date Scraped","video_url","witnesses","transcripts","witness_transcripts"]]
     combined_data = combined_data.drop_duplicates("URL")
     combined_data.to_csv("./SenateVideoFiles/Armed.csv",  encoding='utf-8')
 else: 

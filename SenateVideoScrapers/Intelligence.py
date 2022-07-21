@@ -74,7 +74,8 @@ def get_intelligence_hearings(page: int):
             
             if soup_ind.findAll('div', {'class': 'entity'}) == None:
                 d["witnesses"] = ""
-                logging.error(f'{d["Title"]} at {d["Date"]} lacks witness and transcript information.')
+                if "Closed" in d["Title"] or "RESCHEDULED" in d["Title"] or "POSTPONED" in d["Title"]  or time.strptime(d["Date"], '%m/%d/%y') > datetime.today():
+                    logging.error(f'{d["Title"]} at {d["Date"]} lacks witness and transcript information.')
             else:
                 witness_cards = soup_ind.findAll("div", {"class": "entity"})
                 witness = []
@@ -100,7 +101,8 @@ def get_intelligence_hearings(page: int):
 
                     if w.find("a", string=re.compile(r'Opening Statement|Response')) == None:
                         witness_url = ''
-                        logging.error(f'{d["Title"]} at {d["Date"]} lacks a url for their testimony.')
+                        if "Closed Briefing" not in d["Title"]:
+                            logging.error(f'{d["Title"]} at {d["Date"]} lacks a url for their testimony.')
 
                     else:
                         witness_url = w.find("a", string=re.compile(r'Opening Statement|Response'))
@@ -134,6 +136,7 @@ if os.path.exists("./SenateVideoFiles/Intelligence.csv") == True:
 
     old_data = pd.read_csv("./SenateVideoFiles/Intelligence.csv")
     combined_data = pd.concat([new_data, old_data])
+    combined_data = combined_data[["Date","Time","URL","Title","Location","Committee","Date Scraped","video_url","witnesses","transcripts","witness_transcripts"]]
     combined_data = combined_data.drop_duplicates("URL")
     combined_data.to_csv("./SenateVideoFiles/Intelligence.csv",  encoding='utf-8')
 else:

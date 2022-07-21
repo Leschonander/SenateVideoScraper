@@ -93,7 +93,8 @@ def get_energy_hearings(page: int):
                 d["witnesses"] = ""
                 d["transcripts"] = ""
                 d["witness_transcripts"] = ""
-                logging.error(f'{d["Title"]} at {d["Date"]} lacks witness and transcript information.')
+                if "Closed" in d["Title"] or "RESCHEDULED" in d["Title"] or "POSTPONED" in d["Title"]  or time.strptime(d["Date"], '%m/%d/%y') > datetime.today():
+                    logging.error(f'{d["Title"]} at {d["Date"]} lacks witness and transcript information.')
             else:
                 witness_cards = soup_ind.findAll("li", {"class": "hearing-statement"})
                 witness = []
@@ -107,7 +108,7 @@ def get_energy_hearings(page: int):
 
                     if w.find('a',  {'class': 'pdf-file-btn'}) == None:
                         witness_url = ''
-                        logging.error(f'{d["Title"]} at {d["Date"]} lacks a url for their testimony.')
+                        logging.error(f'{d["Title"]} at {d["Date"]} for lacks a url for their testimony.')
                     else:
                         testimony = w.find('a',  {'class': 'pdf-file-btn'})
                         witness_url = testimony["href"] 

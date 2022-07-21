@@ -40,20 +40,20 @@ def get_agricultural_hearings(rows: int):
     table_rows = soup.findAll('div', { 'class': 'row'})
     data = []
     for t in table_rows:
-        if t.find('time', {'class': 'dtstart'}) == None:
+        if t.find('time') == None:
             date = ""
             time = ""
         else:
-            date_time = t.find('time', {'class': 'dtstart'}).get_text().split(" ")
-            date = date_time[0]
-            time = date_time[1]
+            date_time = t.find('time').get_text().split("\n")
+            date = date_time[1].strip()
+            time = date_time[2].strip()
         
         if t.find('a', {'class': 'LegislationList__link'}) == None:
             url = ""
             title = ""
         else:
             url = t.find('a', {'class': 'LegislationList__link'})["href"]
-            title = t.find('a', {'class': 'LegislationList__link'}).get_text().replace("\n", "").replace("\t", "")
+            title = t.find('a', {'class': 'LegislationList__link'}).get_text().replace("\n", "").replace("\t", "").strip()
         
         if t.findAll("div", {'class': "col-md-3"}) == None:
             location = ""
@@ -63,7 +63,7 @@ def get_agricultural_hearings(rows: int):
             if len(location) != 2:
                 location = ""
             else:
-                location = t.findAll("div", {'class': "col-md-3"})[1].get_text()
+                location = t.findAll("div", {'class': "col-md-3"})[1].get_text().strip()
         
         row_obj = {
             "Date": date,
@@ -90,7 +90,8 @@ def get_agricultural_hearings(rows: int):
                 d["transcripts"] = ""
                 d["witness_transcripts"] = ""
 
-                logging.error(f'{d["Title"]} at {d["Date"]} lacks witness and transcript information.')
+                if "Closed" not in d["Title"] or "RESCHEDULED" not in d["Title"] or "POSTPONED" not in d["Title"]  or time.strptime(d["Date"], '%m/%d/%y') > datetime.today():
+                    logging.error(f'{d["Title"]} at {d["Date"]} lacks witness and transcript information.')
 
             else:
 
@@ -148,6 +149,7 @@ if os.path.exists("./SenateVideoFiles/Agricultural.csv") == True:
     new_data = get_agricultural_hearings(rows=10)
     old_data = pd.read_csv("./SenateVideoFiles/Agricultural.csv")
     combined_data = pd.concat([new_data, old_data])
+    combined_data = combined_data[["Date","Time","URL","Title","Location","Committee","Date Scraped","video_url","witnesses","transcripts","witness_transcripts"]]
     combined_data = combined_data.drop_duplicates("URL")
     combined_data.to_csv("./SenateVideoFiles/Agricultural.csv",  encoding='utf-8')
 else: 

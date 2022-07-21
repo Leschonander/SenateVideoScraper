@@ -88,7 +88,8 @@ def get_homeland_security_hearings(page: int):
                 d["transcripts"] = ""
                 d["witness_transcripts"] = ""
 
-                logging.error(f'{d["Title"]} at {d["Date"]} lacks witness and transcript information.')
+                if "Closed" in d["Title"] or "RESCHEDULED" in d["Title"] or "POSTPONED" in d["Title"]  or time.strptime(d["Date"], '%m/%d/%y') > datetime.today():
+                    logging.error(f'{d["Title"]} at {d["Date"]} lacks witness and transcript information.')
 
             else:
                 people_list = soup_ind.find("ul", {"class": "people"})
@@ -148,6 +149,7 @@ if os.path.exists("./SenateVideoFiles/HomeLandSecurity.csv") == True:
 
     old_data = pd.read_csv("./SenateVideoFiles/HomeLandSecurity.csv",  lineterminator='\n')
     combined_data = pd.concat([new_data, old_data])
+    combined_data = combined_data[["Date","Time","URL","Title","Location","Committee","Date Scraped","video_url","witnesses","transcripts","witness_transcripts"]]
     combined_data = combined_data.drop_duplicates("URL")
     combined_data.to_csv("./SenateVideoFiles/HomeLandSecurity.csv",  encoding='utf-8')
 

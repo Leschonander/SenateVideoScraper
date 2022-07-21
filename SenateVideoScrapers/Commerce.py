@@ -81,7 +81,8 @@ def get_commerce_hearings(year: int):
                 d["witnesses"] = ""
                 d["transcripts"] = ""
                 d["witness_transcripts"] = ""
-                logging.error(f'{d["Title"]} at {d["Date"]} lacks witness and transcript information.')
+                if "Closed" not in d["Title"] or "RSCHEDULED" not in d["Title"] or "POSTPONED" not in d["Title"]  or time.strptime(d["Date"], '%m/%d/%y') > datetime.today():
+                    logging.error(f'{d["Title"]} at {d["Date"]} lacks a url for their testimony.')
             else:
                 witness_cards = soup_ind.findAll("li", {"class": "hearing-statement"})
                 witness = []
@@ -94,7 +95,8 @@ def get_commerce_hearings(year: int):
                     witness_name = ' '.join(witness_name.split())
                     if w.find('a') == None:
                         witness_url = ''
-                        logging.error(f'{d["Title"]} at {d["Date"]} lacks a url for their testimony.')
+                        if "Closed" in d["Title"] or "RESCHEDULED" in d["Title"] or "POSTPONED" in d["Title"]  or time.strptime(d["Date"], '%m/%d/%y') > datetime.today():
+                            logging.error(f'{d["Title"]} at {d["Date"]} lacks a url for their testimony.')
                     else:
                         testimony = w.find("a")['href']
                         if 'https:' in testimony or 'http:' in testimony:
@@ -127,6 +129,7 @@ if os.path.exists("./SenateVideoFiles/Commerce.csv") == True:
     new_data = get_commerce_hearings(year)
     old_data = pd.read_csv("./SenateVideoFiles/Commerce.csv")
     combined_data = pd.concat([new_data, old_data])
+    combined_data = combined_data[["Date","Time","URL","Title","Location","Committee","Date Scraped","video_url","witnesses","transcripts","witness_transcripts"]]
     combined_data = combined_data.drop_duplicates("URL")
     combined_data.to_csv("./SenateVideoFiles/Commerce.csv",  encoding='utf-8')
 else:

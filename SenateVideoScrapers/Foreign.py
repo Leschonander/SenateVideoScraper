@@ -97,7 +97,8 @@ def get_foreign_hearings(rows: int):
                 d["witnesses"] = ""
                 d["transcripts"] = ""
                 d["witness_transcripts"] = ""
-                logging.error(f'{d["Title"]} at {d["Date"]} lacks witness and transcript information.')
+                if "Closed" in d["Title"] or "RESCHEDULED" in d["Title"] or "POSTPONED" in d["Title"]  or time.strptime(d["Date"], '%m/%d/%y') > datetime.today():
+                    logging.error(f'{d["Title"]} at {d["Date"]} lacks witness and transcript information.')
 
             else:
                 witness_cards = soup_ind.findAll("li", {"class": "vcard"})
@@ -112,7 +113,8 @@ def get_foreign_hearings(rows: int):
 
                     if w.find('a',  {'class': 'hearing-pdf'}) == None:
                         witness_url = ''
-                        logging.error(f'{d["Title"]} at {d["Date"]} lacks a url for their testimony.')
+                        if "Closed" in d["Title"] or "RESCHEDULED" in d["Title"] or "POSTPONED" in d["Title"]:
+                            logging.error(f'{d["Title"]} at {d["Date"]} lacks witness and transcript information.')
                     else:
                         testimony = w.find('a',  {'class': 'hearing-pdf'})
                         if 'https:' in testimony["href"] or 'http:' in testimony["href"]:
@@ -125,7 +127,8 @@ def get_foreign_hearings(rows: int):
                                     witness_url = pdf_page.url
                                 except:
                                     witness_url = ""
-                                    logging.error(f'{d["Title"]} at {d["Date"]} lacks a url for their testimony.')
+                                    if "Closed" in d["Title"] or "RESCHEDULED" in d["Title"] or "POSTPONED" in d["Title"]:
+                                        logging.error(f'{d["Title"]} at {d["Date"]} lacks witness and transcript information.')
                     
                     witness.append(witness_name)
                     transcripts.append(witness_url)
@@ -146,6 +149,7 @@ if os.path.exists("./SenateVideoFiles/Foreign.csv") == True:
     new_data = get_foreign_hearings(rows=20)
     old_data = pd.read_csv("./SenateVideoFiles/Foreign.csv")
     combined_data = pd.concat([new_data, old_data])
+    combined_data = combined_data[["Date","Time","URL","Title","Location","Committee","Date Scraped","video_url","witnesses","transcripts","witness_transcripts"]]
     combined_data = combined_data.drop_duplicates("URL")
     combined_data.to_csv("./SenateVideoFiles/Foreign.csv",  encoding='utf-8')
 else: 

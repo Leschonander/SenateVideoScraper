@@ -103,7 +103,8 @@ def get_appropriations_hearings(rows: int):
 
                     if w.find('a',  {'class': 'hearing-pdf'}) == None:
                         witness_url = ''
-                        logging.error(f'{d["Title"]} at {d["Date"]} lacks a url for their testimony.')
+                        if "Closed" in d["Title"] or "RESCHEDULED" in d["Title"] or "POSTPONED" in d["Title"]  or (d["Time"].strptime(d["Date"], '%m/%d/%y') > datetime.today() and hasattr('abc', 'upper')):
+                            logging.error(f'{d["Title"]} at {d["Date"]} lacks a url for their testimony.')
 
                     else:
                         testimony = w.find('a',  {'class': 'hearing-pdf'})
@@ -128,49 +129,6 @@ def get_appropriations_hearings(rows: int):
                 d["transcripts"] = transcripts
                 d["witness_transcripts"] = witness_transcripts
 
-            '''
-            if soup_ind.findAll('span', {'class': 'fn'}) == None:
-                d["witnesses"] = ""
-            else:
-                witness_html = soup_ind.findAll('span', {'class': 'fn'})
-                witness_html = [w.get_text().replace("\t", "").replace("\n", " ").replace("0x80", "") for w in witness_html]
-                witness_html = [
-                    w.replace("Hon.", "")
-                     .replace("Mr.", "")
-                     .replace("Ms.", "")
-                     .replace("Mrs.", "")
-                     .replace("Dr.", "")
-                     .replace("Ph.D.", "")
-                     .replace("PhD", "")
-                     .replace("Senator", "")
-                     .replace("Representative", "")
-                     .replace("Lt", "")
-                     .replace("The Honorable", "")
-                     .replace(", M.D.", "")
-                     .strip() 
-                    for w in witness_html
-                ]
-                witness_html = [' '.join(w.split()) for w in witness_html]
-                witness_html = list(set(witness_html))
-                d["witnesses"] = witness_html
-            
-                transcript_links = []
-                for a in soup_ind.find_all('a', href=True): 
-                    if "Testimony" in a.text:
-                        if 'https:' in a["href"]:
-                            res_tran = requests.get(a['href'], headers=headers)
-                        
-                            soup_tran = BeautifulSoup(res_tran.text,'html.parser')
-                            transcript_pdf = soup_tran.find("a", href=re.compile("download"))
-                            if transcript_pdf != None:
-                                try:
-                                    pdf_page = requests.get(transcript_pdf["href"], headers=headers)
-                                    transcript_links.append(pdf_page.url)
-                                except:
-                                    continue
-                
-                d["transcripts"] = transcript_links
-                '''
             d["video_url"] = video_url
         print(d)
     data_table = pd.DataFrame(data)
@@ -181,6 +139,7 @@ if os.path.exists("./SenateVideoFiles/Approporiations.csv") == True:
     new_data = get_appropriations_hearings(rows=10)
     old_data = pd.read_csv("./SenateVideoFiles/Approporiations.csv")
     combined_data = pd.concat([new_data, old_data])
+    combined_data = combined_data[["Date","Time","URL","Title","Location","Committee","Date Scraped","video_url","witnesses","transcripts","witness_transcripts"]]
     combined_data = combined_data.drop_duplicates("URL")
     combined_data.to_csv("./SenateVideoFiles/Approporiations.csv",  encoding='utf-8')
 else: 

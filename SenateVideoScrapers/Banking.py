@@ -89,7 +89,8 @@ def get_banking_hearings(rows: int):
                 d["witnesses"] = ""
                 d["transcripts"] = ""
                 d["witness_transcripts"] = ""
-                logging.error(f'{d["Title"]} at {d["Date"]} lacks witness and transcript information.')
+                if "Closed" not in d["Title"] or "RSCHEDULED" not in d["Title"] or "POSTPONED" not in d["Title"]  or time.strptime(d["Date"], '%m/%d/%y') > datetime.today():
+                    logging.error(f'{d["Title"]} at {d["Date"]} lacks a url for their testimony.')
 
             else:
                 witness_cards = soup_ind.findAll("li", {"class": "vcard"})
@@ -139,6 +140,7 @@ if os.path.exists("./SenateVideoFiles/Banking.csv") == True:
     new_data = get_banking_hearings(rows=10)
     old_data = pd.read_csv("./SenateVideoFiles/Banking.csv")
     combined_data = pd.concat([new_data, old_data])
+    combined_data = combined_data[["Date","Time","URL","Title","Location","Committee","Date Scraped","video_url","witnesses","transcripts","witness_transcripts"]]
     combined_data = combined_data.drop_duplicates("URL")
     combined_data.to_csv("./SenateVideoFiles/Banking.csv",  encoding='utf-8')
 else: 

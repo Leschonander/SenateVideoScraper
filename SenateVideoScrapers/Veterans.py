@@ -86,7 +86,8 @@ def get_veterans_hearings(rows: int):
                 d["witnesses"] = ""
                 d["transcripts"] = ""
                 d["witness_transcripts"] = ""
-                logging.error(f'{d["Title"]} at {d["Date"]} lacks witness and transcript information.')
+                if "Closed" in d["Title"] or "RESCHEDULED" in d["Title"] or "POSTPONED" in d["Title"]  or time.strptime(d["Date"], '%m/%d/%y') > datetime.today():
+                    logging.error(f'{d["Title"]} at {d["Date"]} lacks witness and transcript information.')
             else:
                 witness_cards = soup_ind.findAll("li", {"class": "vcard"})
                 witness = []
@@ -134,6 +135,7 @@ if os.path.exists("./SenateVideoFiles/Veterans.csv") == True:
     new_data = get_veterans_hearings(rows=10)
     old_data = pd.read_csv("./SenateVideoFiles/Veterans.csv")
     combined_data = pd.concat([new_data, old_data])
+    combined_data = combined_data[["Date","Time","URL","Title","Location","Committee","Date Scraped","video_url","witnesses","transcripts","witness_transcripts"]]
     combined_data = combined_data.drop_duplicates("URL")
     combined_data.to_csv("./SenateVideoFiles/Veterans.csv",  encoding='utf-8')
 else: 
