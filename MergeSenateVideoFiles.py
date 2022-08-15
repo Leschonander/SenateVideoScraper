@@ -50,4 +50,14 @@ data_frames.to_csv("./SenateVideoFiles/MasterFile.csv",  encoding='utf-8', index
 os.system(f"python3 witnessCounts.py")
 os.system(f"Rscript TagFiles.R")
 
+master_file = pd.read_csv("./SenateVideoFiles/MasterFile.csv")
+master_file.reset_index(inplace=True)
+
+tag_file = pd.read_csv("MasterFileWithTags.csv")
+tag_file.reset_index(inplace=True)
+tag_file = tag_file[["index", "Tags"]]
+merged_data = pd.merge(master_file, tag_file, on =  "index", how="left")
+merged_data.to_csv("./SenateVideoFiles/MasterFile.csv",  encoding='utf-8', index=False)
+
+
 logging.info("Scraper run complete")
