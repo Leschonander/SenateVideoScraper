@@ -5,6 +5,7 @@ basic_tags <- read_csv("basic_tags_tibble.csv") %>% .[[1]]
 lda_tags <- read_csv("lda_tags.csv") %>% .[[2]]
 
 combined_tags <- c(basic_tags, lda_tags)
+# combined_tags %>% as_tibble() %>% rename(`Tag Name` = value) %>% write_csv("combined_tags.csv")
 
 masterfile_with_tags <- masterfile %>%
   mutate(
