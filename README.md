@@ -10,7 +10,7 @@ Within `senateVideos`, there is a CSV file for each major Senate committee, alon
 
 ## Requirements
 
-A `requirments.txt` file is linked in the repository. While more then 3 packages are listed, the main 3 packages
+A `requirements.txt` file is linked in the repository. While more then 3 packages are listed, the main 3 packages
 to work with the scraper are:
 
 * Beautiful Soup
