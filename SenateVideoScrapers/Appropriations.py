@@ -103,7 +103,7 @@ def get_appropriations_hearings(rows: int):
 
                     if w.find('a',  {'class': 'hearing-pdf'}) == None:
                         witness_url = ''
-                        if "Closed" in d["Title"] or "RESCHEDULED" in d["Title"] or "POSTPONED" in d["Title"]  or (d["Time"].strptime(d["Date"], '%m/%d/%y') > datetime.today() and hasattr('abc', 'upper')):
+                        if "Closed" in d["Title"] or "RESCHEDULED" in d["Title"] or "POSTPONED" in d["Title"]  or (datetime.strptime(d["Date"], "%m/%d/%y") > datetime.today() and hasattr('abc', 'upper')):
                             logging.error(f'{d["Title"]} at {d["Date"]} lacks a url for their testimony.')
 
                     else:
