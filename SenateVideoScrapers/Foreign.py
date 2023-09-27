@@ -36,36 +36,37 @@ def get_foreign_hearings(rows: int):
 
     soup =  BeautifulSoup(res.text,'html.parser')
 
-    table_rows = soup.findAll('tr', { 'class': 'vevent'})
+    table_rows = soup.findAll('a', { 'class': 'LegislationList__item'})
     data = []
     for t in table_rows:
-        if t.find('time', {'class': 'dtstart'}) == None:
+        if t.find('time') == None:
             date = ""
             time = ""
         else:
-            date_time = t.find('time', {'class': 'dtstart'}).get_text().split(" ")
+            date_time = t.find('time').get_text().replace("\n", "").replace("\t", "").strip().split("at")
             
-            try:
-                date = date_time[0]
-            except:
-                date = ""
-            try:
-                time = date_time[1]
-            except IndexError:
-                time = ""
+        try:
+            date = date_time[0].strip()
+        except:
+            date = ""
+        try:
+            time = date_time[2].strip()
+        except IndexError:
+            time = ""
         
-        if t.find('a', {'class': 'summary'}) == None:
-            url = ""
+        try:
+            title = t.find("div", {'class': "LegislationList__title LegislationList__itemText"}).get_text().replace("\n", "").replace("\t", "").strip()
+        except:
             title = ""
-        else:
-            url = "https://www.foreign.senate.gov" + t.find('a', {'class': 'summary'})["href"]
-            title = t.find('a', {'class': 'summary'}).get_text().replace("\n", "").replace("\t", "")
         
 
-        if t.find('span', {'class': 'location'}) == None:
+        url = t["href"]
+
+        if  t.find("div", {'class': "LegislationList__itemText"}) == None:
             location = ""
         else:
-            location =  t.find('span', {'class': 'location'}).get_text()
+            location =  t.findAll("div", {'class': "LegislationList__itemText"})[2].get_text().rstrip().lstrip()
+        
             
         row_obj = {
             "Date": date,
@@ -93,7 +94,7 @@ def get_foreign_hearings(rows: int):
             
             d["video_url"] = video_url
 
-            if soup_ind.findAll('li', {'class': 'vcard'}) == None:
+            if soup_ind.findAll('li', {'class': 'col-12'}) == None:
                 d["witnesses"] = ""
                 d["transcripts"] = ""
                 d["witness_transcripts"] = ""
@@ -101,30 +102,33 @@ def get_foreign_hearings(rows: int):
                     logging.error(f'{d["Title"]} at {d["Date"]} lacks witness and transcript information.')
 
             else:
-                witness_cards = soup_ind.findAll("li", {"class": "vcard"})
+                witness_cards = soup_ind.findAll("li", {"class": "col-12"})
                 witness = []
                 transcripts = []
                 witness_transcripts = []
 
                 for w in witness_cards:
-                    witness_name = w.find('span',  {'class': 'fn'}).get_text().replace("\t", "").replace("\n", " ").replace("0x80", "").strip()
+                    
+                    witness_name = w.find('span',  {'class': 'bold'}).get_text().replace("\t", "").replace("\n", " ").replace("0x80", "").strip()
                     witness_name = witness_name.replace("Hon.", "").replace("Mr.", "").replace("Ms.", "").replace("Mrs.", "").replace("Dr.", "").replace("Ph.D.", "").replace("PhD", "").replace("Senator", "").replace("Representative", "").replace("Lt", "").replace("The Honorable", "").replace("(R-GA)", "").strip() 
                     witness_name = ' '.join(witness_name.split())
 
-                    if w.find('a',  {'class': 'hearing-pdf'}) == None:
+                    if w.find('div',  {'class': 'mt-3'}) == None:
                         witness_url = ''
                         if "Closed" in d["Title"] or "RESCHEDULED" in d["Title"] or "POSTPONED" in d["Title"]:
                             logging.error(f'{d["Title"]} at {d["Date"]} lacks witness and transcript information.')
                     else:
-                        testimony = w.find('a',  {'class': 'hearing-pdf'})
+                        testimony = w.find('div',  {'class': 'mt-3'}).find("a")
                         if 'https:' in testimony["href"] or 'http:' in testimony["href"]:
                             res_tran = requests.get(testimony['href'], headers=headers)
                             soup_tran = BeautifulSoup(res_tran.text,'html.parser')
                             transcript_pdf = soup_tran.find("a", href=re.compile("download"))
+                            
                             if transcript_pdf != None:
                                 try:
-                                    pdf_page = requests.get("https:" + transcript_pdf["href"], headers=headers)
+                                    pdf_page = requests.get(transcript_pdf["href"], headers=headers)
                                     witness_url = pdf_page.url
+                                    
                                 except:
                                     witness_url = ""
                                     if "Closed" in d["Title"] or "RESCHEDULED" in d["Title"] or "POSTPONED" in d["Title"]:
