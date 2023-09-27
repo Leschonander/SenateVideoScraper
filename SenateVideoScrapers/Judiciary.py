@@ -36,38 +36,36 @@ def get_judiciary_hearings(rows: int):
     res = requests.get(url, headers=headers)
 
     soup =  BeautifulSoup(res.text,'html.parser')
-    table_rows = soup.findAll('tr', { 'class': 'vevent'})
+    table_rows = soup.findAll('div', { 'class': 'LegislationList__item'})
     data = []
     for t in table_rows:
-
-        if t.find('time', {'class': 'dtstart'}) == None:
+        
+        if t.find('time') == None:
             date = ""
             time = ""
         else:
-            date_time = t.find('time', {'class': 'dtstart'}).get_text().split(" ")
+            date_time = t.find('time').get_text().replace("\n", "").replace("\t", "").strip().split("at")
             
-            try:
-                date = date_time[0]
-            except:
-                date = ""
+        try:
+            date = date_time[0].strip()
+        except:
+            date = ""
+        try:
+            time = date_time[2].strip()
+        except IndexError:
+            time = ""
 
-            try:
-                time = date_time[1]
-            except:
-                time = ""
-
-        if t.find('a') == None:
+        if  t.find("a", {'class': "LegislationList__title"}) == None:
             url = ""
             title = ""
         else:
-            url = "https://www.judiciary.senate.gov" + t.find('a')["href"]
-            title = t.find('a').get_text().strip()
+            url = t.find("a", {'class': "LegislationList__title"})["href"].replace("\n", "").replace("\t", "")
+            title = t.find("a").get_text().replace("\n", "").replace("\t", "").strip()
 
-        if t.find('span', {'class': 'location'}) == None:
+        if  t.find("div", {'class': "LegislationList__colLocation"}) == None:
             location = ""
         else:
-            location =  t.find('span', {'class': 'location'}).get_text()
-        
+            location =  t.find("div", {'class': "LegislationList__colLocation"}).get_text().rstrip().lstrip()
 
         row_obj = {
             "Date": date,
@@ -91,7 +89,7 @@ def get_judiciary_hearings(rows: int):
             else:
                 video_url =  "https://www.judiciary.senate.gov" + soup_ind.find('a', { 'id': 'watch-live-now'})["href"].replace("javascript:openVideoWin('", "").replace("');", "")
             
-            if soup_ind.findAll('div', {'class': 'vcard'}) == None:
+            if soup_ind.findAll('div', {'class': 'Hearing__orderedListBullet'}) == None:
                 d["witnesses"] = ""
                 d["transcripts"] = ""
                 d["witness_transcripts"] = ""
@@ -99,7 +97,7 @@ def get_judiciary_hearings(rows: int):
                     logging.error(f'{d["Title"]} at {d["Date"]} lacks witness and transcript information.')
 
             else:
-                witness_cards = soup_ind.findAll("div", {"class": "vcard"})
+                witness_cards = soup_ind.findAll("div", {"class": "Hearing__orderedListBullet"})
                 witness = []
                 transcripts = []
                 witness_transcripts = []
@@ -109,15 +107,16 @@ def get_judiciary_hearings(rows: int):
                     if  w.find('span',  {'class': 'fn'}) == None:
                         witness_name = ''
                     else: 
-                        witness_name = w.find('span',  {'class': 'fn'}).get_text().replace("\t", "").replace("\n", " ").replace("0x80", "").strip()
+                        witness_name = w.find('h3',  {'class': 'Heading__title'}).get_text().replace("\t", "").replace("\n", " ").replace("0x80", "").strip()
                         witness_name = witness_name.replace("Hon.", "").replace("Mr.", "").replace("Ms.", "").replace("Mrs.", "").replace("Dr.", "").replace("Ph.D.", "").replace("PhD", "").replace("Senator", "").replace("Representative", "").replace("Lt", "").replace("The Honorable", "").replace("(R-GA)", "").strip() 
                         witness_name = ' '.join(witness_name.split())
 
-                    if w.find('a',  {'class': 'hearing-pdf'}) == None:
+                    if w.find('div',  {'class': 'mt-3'}) == None:
                         witness_url = ''
                         logging.error(f'{d["Title"]} at {d["Date"]} lacks a url for their testimony.')
                     else:
-                        testimony = w.find('a',  {'class': 'hearing-pdf'})
+                        testimony = w.find('div',  {'class': 'mt-3'}).find("a")
+                        
                         if ('https:' in testimony["href"] or 'http:' in testimony["href"]):
                             try:
                                 res_tran = requests.get(testimony['href'], headers=headers)
@@ -129,11 +128,11 @@ def get_judiciary_hearings(rows: int):
                             transcript_pdf = soup_tran.find("a", href=re.compile("download"))
                             if transcript_pdf != None:
                                 try:
-                                    pdf_page = requests.get("https:" + transcript_pdf["href"], headers=headers)
+                                    pdf_page = requests.get(transcript_pdf["href"], headers=headers)
                                     witness_url = pdf_page.url
                                 except:
                                     witness_url = ""
-                                    if d["Time"].strptime(d["Date"], '%m/%d/%y') > datetime.today():
+                                    if datetime.strptime(d["Date"], "%m/%d/%y") > datetime.today():
                                         logging.error(f'{d["Title"]} at {d["Date"]} lacks a url for their testimony.')
                     
                     witness.append(witness_name)
@@ -148,10 +147,11 @@ def get_judiciary_hearings(rows: int):
         print(d)
     
     data_table = pd.DataFrame(data)
+    print(data_table)
     return data_table
 
 if os.path.exists("./SenateVideoFiles/Judiciary.csv") == True:
-    new_data = get_judiciary_hearings(rows=10)
+    new_data = get_judiciary_hearings(rows=30)
     old_data = pd.read_csv("./SenateVideoFiles/Judiciary.csv")
     combined_data = pd.concat([new_data, old_data])
     combined_data = combined_data[["Date","Time","URL","Title","Location","Committee","Date Scraped","video_url","witnesses","transcripts","witness_transcripts"]]
