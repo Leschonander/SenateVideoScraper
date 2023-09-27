@@ -36,29 +36,27 @@ def get_health_hearings(rows: int):
     res = requests.get(url, headers=headers)
 
     soup =  BeautifulSoup(res.text,'html.parser')
-    table_rows = soup.findAll('tr', { 'class': 'vevent'})
+    table_rows = soup.findAll('div', { 'class': 'LegislationList__item'})
     data = []
     for t in table_rows:
-        if t.find('time', {'class': 'dtstart'}) == None:
-            date = ""
-            time = ""
-        else:
-            date_time = t.find('time', {'class': 'dtstart'}).get_text().split(" ")
-            date = date_time[0]
-            time = date_time[1]
         
-        if t.find('a', {'class': 'summary'}) == None:
+        if t.find("time") == None:
+            date = ["", ""]
+        else:
+            date = t.find("time")["datetime"]
+            time = t.find("time").find('span', class_='sr-only', string='Time:').next_sibling.strip()
+        
+        if  t.find("a") == None:
             url = ""
             title = ""
         else:
-            url = "https://www.help.senate.gov/" + t.find('a', {'class': 'summary'})["href"]
-            title = t.find('a', {'class': 'summary'}).get_text().replace("\n", "").replace("\t", "")
-        
+            url = t.find("a")["href"].replace("\n", "").replace("\t", "")
+            title = t.find("a").get_text().replace("\n", "").replace("\t", "").strip()
 
-        if t.find('span', {'class': 'location'}) == None:
+        if  t.find("div", {'class': "LegislationList__locationCol"}) == None:
             location = ""
         else:
-            location =  t.find('span', {'class': 'location'}).get_text()
+            location =  t.find("div", {'class': "LegislationList__locationCol"}).get_text().rstrip().lstrip()
         
         row_obj = {
             "Date": date,
@@ -84,7 +82,7 @@ def get_health_hearings(rows: int):
             else:
                 video_url =  "https://www.help.senate.gov" + soup_ind.find('a', { 'id': 'watch-live-now'})["href"].replace("javascript:openVideoWin('", "").replace("');", "")
             
-            if soup_ind.findAll('li', {'class': 'vcard'}) == None:
+            if soup_ind.findAll('div', {'class': 'Hearing__orderedListBullet'}) == None:
                 d["witnesses"] = ""
                 d["transcripts"] = ""
                 d["witness_transcripts"] = ""
@@ -92,21 +90,21 @@ def get_health_hearings(rows: int):
                     logging.error(f'{d["Title"]} at {d["Date"]} lacks witness and transcript information.')
 
             else:
-                witness_cards = soup_ind.findAll("li", {"class": "vcard"})
+                witness_cards = soup_ind.findAll("div", {"class": "Hearing__orderedListBullet"})
                 witness = []
                 transcripts = []
                 witness_transcripts = []
 
                 for w in witness_cards:
-                    witness_name = w.find('span',  {'class': 'fn'}).get_text().replace("\t", "").replace("\n", " ").replace("0x80", "").strip()
+                    witness_name = w.find('h3',  {'class': 'Heading__title'}).get_text().replace("\t", "").replace("\n", " ").replace("0x80", "").strip()
                     witness_name = witness_name.replace("Hon.", "").replace("Mr.", "").replace("Ms.", "").replace("Mrs.", "").replace("Dr.", "").replace("Ph.D.", "").replace("PhD", "").replace("Senator", "").replace("Representative", "").replace("Lt", "").replace("The Honorable", "").replace("(R-GA)", "").strip() 
                     witness_name = ' '.join(witness_name.split())
 
-                    if w.find('a',  {'class': 'hearing-pdf'}) == None:
+                    if w.find('div',  {'class': 'mt-3'}) == None:
                         witness_url = ''
                         logging.error(f'{d["Title"]} at {d["Date"]} lacks a url for their testimony.')
                     else:
-                        testimony = w.find('a',  {'class': 'hearing-pdf'})
+                        testimony = w.find('div',  {'class': 'mt-3'}).find("a")
                         if ('https:' in testimony["href"] or 'http:' in testimony["href"]) and "https://www.help.senate.gov" in testimony["href"]:
                             res_tran = requests.get(testimony['href'], headers=headers)
                             soup_tran = BeautifulSoup(res_tran.text,'html.parser')
