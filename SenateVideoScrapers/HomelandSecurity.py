@@ -88,7 +88,7 @@ def get_homeland_security_hearings(page: int):
                 d["transcripts"] = ""
                 d["witness_transcripts"] = ""
 
-                if "Closed" in d["Title"] or "RESCHEDULED" in d["Title"] or "POSTPONED" in d["Title"]  or time.strptime(d["Date"], '%m/%d/%y') > datetime.today():
+                if "Closed" in d["Title"] or "RESCHEDULED" in d["Title"] or "POSTPONED" in d["Title"]  or datetime.strptime(d["Date"], "%m/%d/%y") > datetime.today():
                     logging.error(f'{d["Title"]} at {d["Date"]} lacks witness and transcript information.')
 
             else:
