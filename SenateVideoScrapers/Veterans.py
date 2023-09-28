@@ -35,29 +35,27 @@ def get_veterans_hearings(rows: int):
     res = requests.get(url, headers=headers)
 
     soup =  BeautifulSoup(res.text,'html.parser')
-    table_rows = soup.findAll('tr', { 'class': 'vevent'})
+    table_rows = soup.findAll('div', { 'class': 'hearing-list-item'})
     data = []
     for t in table_rows:
-        if t.find('time', {'class': 'dtstart'}) == None:
+        if t.find('span', {'class': 'hearing-list-datetime'}) == None:
             date = ""
             time = ""
         else:
-            date_time = t.find('time', {'class': 'dtstart'}).get_text().split(" ")
-            date = date_time[0]
-            time = date_time[1]
+            date = t.find('strong').get_text().strip()
+            time = t.find("span", {'class': 'hearing-list-datetime'}).get_text().replace("\n", "").replace("\t", "").strip().replace(" ", "").split("\r")[1]
         
-        if t.find('a', {'class': 'summary'}) == None:
+        if t.find('a') == None:
             url = ""
+        else:
+            url = t.find('a')["href"]
+
+        if t.find('div', {'class': "hearing-list-title"}) == None:
             title = ""
         else:
-            url = t.find('a', {'class': 'summary'})["href"].replace("\n", "").replace("\t", "")
-            title = t.find('a', {'class': 'summary'}).get_text().replace("\n", "").replace("\t", "")
-        
+            title = t.find('div', {'class': "hearing-list-title"}).get_text()
 
-        if t.find('span', {'class': 'location'}) == None:
-            location = ""
-        else:
-            location =  t.find('span', {'class': 'location'}).get_text()
+        location = "not on this page"
         
         row_obj = {
             "Date": date,
@@ -77,48 +75,48 @@ def get_veterans_hearings(rows: int):
         else:
             res_ind = requests.get(d["URL"])
             soup_ind = BeautifulSoup(res_ind.text,'html.parser')
+
+            d["Location"] = soup_ind.find('span', {'class': "hearing-event-details"}).get_text().replace("\n", "").strip()
             
             if soup_ind.find('a', { 'id': 'watch-live-now'}) == None:
                 video_url = ""
             else:
                 video_url = "https://www.veterans.senate.gov" + soup_ind.find('a', { 'id': 'watch-live-now'})["href"].replace("javascript:openVideoWin('", "").replace("');", "")
-            if soup_ind.findAll('li', {'class': 'vcard'}) == None:
+            if soup_ind.findAll('li', {'class': 'hearing-statement'}) == None:
                 d["witnesses"] = ""
                 d["transcripts"] = ""
                 d["witness_transcripts"] = ""
                 if "Closed" in d["Title"] or "RESCHEDULED" in d["Title"] or "POSTPONED" in d["Title"]  or time.strptime(d["Date"], '%m/%d/%y') > datetime.today():
                     logging.error(f'{d["Title"]} at {d["Date"]} lacks witness and transcript information.')
             else:
-                witness_cards = soup_ind.findAll("li", {"class": "vcard"})
+                witness_cards = soup_ind.findAll("li", {"class": "hearing-statement"})
+
                 witness = []
                 transcripts = []
                 witness_transcripts = []
 
                 for w in witness_cards:
-                    witness_name = w.find('span',  {'class': 'fn'}).get_text().replace("\t", "").replace("\n", " ").replace("0x80", "").strip()
+                    
+                    witness_name = w.find('h4',  {'class': 'full-name'}).get_text().replace("\t", "").replace("\n", " ").replace("0x80", "").strip()
                     witness_name = witness_name.replace("Hon.", "").replace("Mr.", "").replace("Ms.", "").replace("Mrs.", "").replace("Dr.", "").replace("Ph.D.", "").replace("PhD", "").replace("Ph.D", "").replace("MD", "").replace("M.D.", "").replace("MPH", "").replace("MSW", "").replace("Esq", "").replace("Esq.", "").replace("JD", "").replace("Senator", "").replace("Representative", "").replace("Lt", "").replace("The Honorable", "").replace("Honorable", "").replace("Ranking Member", "").replace("Chairman", "").replace("Chair", "").replace("USN", "").replace("USA", "").replace("USMC", "").replace("USN", "").replace("USCG", "").replace("USAF", "").replace("MACP", "").replace("(Ret)", "").replace(",", "").strip() 
                     witness_name = ' '.join(witness_name.split())
-
-                    if w.find('a',  {'class': 'hearing-pdf'}) == None:
+                    
+                    if w.find('a') == None:
                         witness_url = ''
                         logging.error(f'{d["Title"]} at {d["Date"]} lacks a url for their testimony.')
                     else:
-                        testimony = w.find('a',  {'class': 'hearing-pdf'})
+                        testimony = w.find('a')
                         if 'https:' in testimony["href"] or 'http:' in testimony["href"]:
                             res_tran = requests.get(testimony['href'], headers=headers)
-                            soup_tran = BeautifulSoup(res_tran.text,'html.parser')
-                            transcript_pdf = soup_tran.find("a", href=re.compile("download"))
-                            if transcript_pdf != None:
-                                pdf_page = requests.get(transcript_pdf["href"], headers=headers)
-                                witness_url = pdf_page.url
-                            else:
-                                witness_url = ''
-                                logging.error(f'{d["Title"]} at {d["Date"]} lacks a url for their testimony.')
+                            witness_url = res_tran.url
+                        else:
+                            witness_url = ''
+                            logging.error(f'{d["Title"]} at {d["Date"]} lacks a url for their testimony.')
                     
                     witness.append(witness_name)
                     transcripts.append(witness_url)
                     witness_transcripts.append((witness_name,witness_url))
-                
+                    
                 d["witnesses"] = witness
                 d["transcripts"] = transcripts
                 d["witness_transcripts"] = witness_transcripts

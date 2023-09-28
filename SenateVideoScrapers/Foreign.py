@@ -150,7 +150,7 @@ def get_foreign_hearings(rows: int):
     return data_table
 
 if os.path.exists("./SenateVideoFiles/Foreign.csv") == True:
-    new_data = get_foreign_hearings(rows=20)
+    new_data = get_foreign_hearings(rows=0)
     old_data = pd.read_csv("./SenateVideoFiles/Foreign.csv")
     combined_data = pd.concat([new_data, old_data])
     combined_data = combined_data[["Date","Time","URL","Title","Location","Committee","Date Scraped","video_url","witnesses","transcripts","witness_transcripts"]]

@@ -5,6 +5,7 @@ import os
 from datetime import datetime
 from dotenv import load_dotenv
 import logging
+import re
 import sentry_sdk
 from sentry_sdk import capture_message
 from sentry_sdk.integrations.logging import LoggingIntegration
@@ -35,28 +36,28 @@ def get_homeland_security_hearings(page: int):
     
     soup =  BeautifulSoup(res.text,'html.parser')
     
-    table_rows = soup.findAll('tr', { 'class': 'vevent'})
+    table_rows = soup.findAll('div', { 'class': 'jet-listing-grid__item'})
     data = []
     for t in table_rows:
-        if t.find('time', {'class': 'dtstart'}) == None:
-            date = ""
-            time = ""
-        else:
-            date_time = t.find('time', {'class': 'dtstart'}).get_text().split(" ")
-            date =  date_time[0]
-            time = date_time[1]
         
-        if t.find('a', {'class': 'summary'}) == None:
+        date =  t.findAll('div', {'class': 'jet-listing-dynamic-field__content'})[1].get_text().strip()
+        time = t.findAll('div', {'class': 'jet-listing-dynamic-field__content'})[2].get_text().strip()
+        
+        if t.find('h3') == None:
             url = ""
             title = ""
         else:
-            url = t.find('a', {'class': 'summary'})["href"]
-            title = t.find('a', {'class': 'summary'}).get_text().replace("\n", "").replace("\t", "")
+            if t.find('h3').find("a") == None:
+                url = ""
+            else:
+                url =  t.find('h3').find("a")["href"]
+            title = t.find('h3').get_text().replace("\n", "").replace("\t", "").strip()
 
-        if t.find('span', {'class': 'location'}) == None:
+        if t.find('div', {'class': 'jet-listing-dynamic-field__content'}) == None:
             location = ""
         else:
-            location =  t.find('span', {'class': 'location'}).get_text()
+            
+            location =  t.find('div', {'class': 'jet-listing-dynamic-field__content'}).get_text()
         
         row_obj = {
             "Date": date,
@@ -68,10 +69,10 @@ def get_homeland_security_hearings(page: int):
             "Date Scraped": datetime.today().strftime("%Y-%m-%d")
         }
 
-        if "AM" in row_obj["Time"] or "PM" in row_obj["Time"]:
-            data.append(row_obj)
+        data.append(row_obj)
     
     for d in data:
+        print(d)
         if d["URL"] == "":
             video_url = ""
         else:
@@ -83,17 +84,17 @@ def get_homeland_security_hearings(page: int):
             else:
                 video_url =  soup_ind.find('a', { 'id': 'watch-live-now'})["href"].replace("javascript:openVideoWin('", "").replace("');", "")
 
-            if soup_ind.findAll('ul', {'class': 'people'}) == None or soup_ind.findAll('ul', {'class': 'people'}) == []:
+            if soup_ind.find("div", {"class": "elementor-container"}) == None:
                 d["witnesses"] = ""
                 d["transcripts"] = ""
                 d["witness_transcripts"] = ""
-
-                if "Closed" in d["Title"] or "RESCHEDULED" in d["Title"] or "POSTPONED" in d["Title"]  or datetime.strptime(d["Date"], "%m/%d/%y") > datetime.today():
-                    logging.error(f'{d["Title"]} at {d["Date"]} lacks witness and transcript information.')
+                
+                # if "Closed" in d["Title"] or "RESCHEDULED" in d["Title"] or "POSTPONED" in d["Title"]  or datetime.strptime(d["Date"], "%m/%d/%y") > datetime.today():
+                #   logging.error(f'{d["Title"]} at {d["Date"]} lacks witness and transcript information.')
 
             else:
-                people_list = soup_ind.find("ul", {"class": "people"})
-
+                people_list = soup_ind.find("div", {"class": "elementor-container"}, re.compile('DOWNLOAD TESTIMONY'))# soup_ind.find("div", {"class": "elementor-widget-wrap"}, text = re.compile('DOWNLOAD TESTIMONY'))
+                print(people_list.parent)
                 witness_cards = people_list.findAll("li")
                 witness = []
                 transcripts = []
